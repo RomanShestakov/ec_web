@@ -15,6 +15,6 @@ clean:
 # mean that myapp is started. Maybe this works if we do a proper release?
 run:
 	erl -pa apps/*/ebin ./deps/*/ebin ./deps/*/include \
-	-sname nitrogen@rs \
+	-sname nitrogen \
 	-setcookie ec_master \
 	-eval "application:start(web)."
