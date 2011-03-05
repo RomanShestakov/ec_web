@@ -6,7 +6,6 @@ logs
 /bin/*
 .#*
 *.beam
-/rel/*
 /reports/*
 /log/*
 /deps/*
