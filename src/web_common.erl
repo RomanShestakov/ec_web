@@ -21,7 +21,7 @@ footer() ->
 
 assert_path( Str ) when is_list( Str ) ->
     assert_path( #template { 
-       file=filename:join([code:priv_dir(web), 
+       file=filename:join([code:priv_dir(ec_web), 
 			   "templates", 
 			   Str
 			  ])

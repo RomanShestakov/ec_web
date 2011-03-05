@@ -78,4 +78,4 @@ loop(Req) ->
     nitrogen:run().
 
 docroot() ->
-    code:priv_dir(web) ++ "/static".
+    code:priv_dir(ec_web) ++ "/static".

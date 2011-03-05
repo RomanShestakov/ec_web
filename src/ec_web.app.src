@@ -1,4 +1,4 @@
-{application, web, [
+{application, ec_web, [
     {description,  "Web interface"},
     {vsn,          "1"},
     {applications, [kernel, stdlib]},
