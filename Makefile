@@ -5,6 +5,7 @@ get-deps:
 
 compile:
 	./rebar compile
+	(cd priv/static; rm -rf nitrogen; mkdir nitrogen; cp -r ../../deps/nitrogen_core/www/* nitrogen)
 
 clean:
 	./rebar clean
