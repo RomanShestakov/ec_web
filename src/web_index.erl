@@ -20,13 +20,14 @@ layout() ->
 		#tablecell{class=col, body=#label { text="Query", html_encode=true }},
 		#tablecell{class=col, body=#textbox { id=txt_query} },
 		#tablecell{class=col, body=#button{id=btn_go, text="Go", postback=go}}
-	    ]},
+	    ]}
 	    %% show tables with process control buttons
-	    #tablerow{class=row, cells=[
-		#tablecell{class=col, body=#button{id=btn_clean,text="Clean",postback=clean}},
-		#tablecell{class=col, body=#button{id=btn_redo,text="Redo"}},
-		#tablecell{class=col, body=#button{id=btn_cancel,text="Cancel"}}
-	    ]}	    
+	    %% #tablerow{class=row, cells=[
+	    %% 	#tablecell{class=col, body=#button{id=btn_clean,text="Clean",postback=clean}},
+	    %% 	#tablecell{class=col, body=#button{id=btn_redo,text="Redo"}},
+	    %% 	#tablecell{class=col, body=#button{id=btn_cancel,text="Cancel"}}
+	    %% ]}	  
+				       
 	]}},
 	%% put empty panel to output process names
 	#grid_12 { body = #panel{id=pnl_processes,
