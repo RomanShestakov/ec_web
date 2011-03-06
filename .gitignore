@@ -9,4 +9,5 @@ logs
 /reports/*
 /log/*
 /deps/*
+rel/ec_web/*
 test/ec_fsm_process_SUITE_data/*

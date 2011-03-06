@@ -1,6 +1,6 @@
 
 ## Name of the node
--sname ec_web
+-name ec_web@127.0.0.1
 
 ## Cookie for distributed erlang
 -setcookie ec_master
