@@ -1,0 +1,19 @@
+.col {
+    font-weight: bold;
+    text-align: center;
+    width: 150px;
+}
+
+.row {
+    font-style: italic;
+    text-align: center;
+    background-color: #CCCCCC;
+}
+
+.majorcontainer{
+    margin: 0 5px 5px 5px
+    padding: 5px
+    border: 1px solid white
+    background-color: #7399C6
+    min-height: 270px
+}
