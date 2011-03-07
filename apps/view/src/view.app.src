@@ -1,4 +1,4 @@
-{application,ec_web,
+{application,view,
              [{description,"Web interface"},
               {vsn,"1"},
               {applications,[kernel,stdlib]},
@@ -7,7 +7,7 @@
               {env,[{bind_address,"0.0.0.0"},
                     {port,8000},
                     {server_name,web},
-                    {master_name,ec_master@macbook}]},
+                    {master_name, 'ec_master@127.0.0.1'}]},
               {modules,[basic_auth_callback_mod,ec_counter,index_fns,web_404,
                         web_app,web_common,web_index,web_page1,web_page2,
                         web_sup]}]}.

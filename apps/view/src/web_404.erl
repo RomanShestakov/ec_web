@@ -5,7 +5,7 @@
 
 main() ->
     wf:status_code(404),
-    #template { file=filename:join([code:priv_dir(ec_web),
+    #template { file=filename:join([code:priv_dir(view),
 				    "templates", "404.html"]) }.
 
 path() ->
