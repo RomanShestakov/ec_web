@@ -1,13 +1,13 @@
-{application, ec_web, [
-    {description,  "Web interface"},
-    {vsn,          "1"},
-    {applications, [kernel, stdlib]},
-    {registered, []},
-    {mod, {web_app, []}},
-    {env, [
-        {bind_address, "0.0.0.0"},
-        {port, 8000},
-        {server_name, web},
-	{master_name, 'ec_master@macbook'}
-    ]}  
-]}.
+{application,ec_web,
+             [{description,"Web interface"},
+              {vsn,"1"},
+              {applications,[kernel,stdlib]},
+              {registered,[]},
+              {mod,{web_app,[]}},
+              {env,[{bind_address,"0.0.0.0"},
+                    {port,8000},
+                    {server_name,web},
+                    {master_name,ec_master@macbook}]},
+              {modules,[basic_auth_callback_mod,ec_counter,index_fns,web_404,
+                        web_app,web_common,web_index,web_page1,web_page2,
+                        web_sup]}]}.
