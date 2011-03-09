@@ -1,8 +1,7 @@
 -module(index_fns).
 -compile(export_all).
-
 -include_lib("nitrogen_core/include/wf.hrl").
--include("record_definitions.hrl").
+-include_lib("ec_master/include/record_definitions.hrl").
 
 get_schedule_rundates() ->
     S = ec_cli:get_schedulers(),
