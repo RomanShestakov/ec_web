@@ -2,4 +2,4 @@
 start erlang shell with 
 C-C C-X
 flag: 
--pa /Users/romanshestakov/Development/Erlang/ec/lib/ec_web/deps/ec_master/ebin -pa /Users/romanshestakov/Development/Erlang/ec/lib/ec_web/deps/nitrogen_core/ebin
+-name 'emacs1@127.0.0.1' -setcookie ec_master -pa /Users/romanshestakov/Development/Erlang/ec/lib/ec_web/deps/ec_master/ebin -pa /Users/romanshestakov/Development/Erlang/ec/lib/ec_web/deps/nitrogen_core/ebin
