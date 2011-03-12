@@ -61,6 +61,10 @@ init([]) ->
     io:format("configure ec_cli for master: ~p~n", [MasterName]),
     ok = ec_cli:config(MasterName),
 
+    %% init db replication
+    init_db(MasterName),
+
+
     {ok, { {one_for_one, 5, 10}, []} }.
 
 loop(Req) ->
@@ -79,3 +83,25 @@ loop(Req) ->
 
 docroot() ->
     code:priv_dir(view) ++ "/static".
+
+init_db(MasterNode) ->
+    mnesia:stop(),
+    mnesia:delete_schema([node()]),
+    mnesia:start(),
+    dynamic_db_init(MasterNode).
+
+dynamic_db_init(MasterNode) ->
+    add_extra_node(MasterNode).
+
+add_extra_node(MasterNode) ->
+    case mnesia:change_config(extra_db_nodes, [MasterNode] ) of
+	{ok, [_Node]} ->
+	    mnesia:add_table_copy(schema, node(), ram_copies),
+	    mnesia:add_table_copy(key_to_pid, node(), ram_copies),
+	    Tables = mnesia:system_info(tables),
+	    mnesia:wait_for_tables(Tables, 5000),
+	    ok;
+	 Reason ->
+	    {err, Reason}
+    end.
+	    

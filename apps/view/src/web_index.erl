@@ -26,7 +26,8 @@ layout() ->
 	    %% 	#tablecell{class=col, body=#button{id=btn_clean,text="Clean",postback=clean}},
 	    %% 	#tablecell{class=col, body=#button{id=btn_redo,text="Redo"}},
 	    %% 	#tablecell{class=col, body=#button{id=btn_cancel,text="Cancel"}}
-	    %% ]}	  
+	    %% ]}	 
+	    
 				       
 	]}},
 	%% put empty panel to output process names

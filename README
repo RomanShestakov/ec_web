@@ -3,3 +3,16 @@ start erlang shell with
 C-C C-X
 flag: 
 -name 'emacs1@127.0.0.1' -setcookie ec_master -pa /Users/romanshestakov/Development/Erlang/ec/lib/ec_web/deps/ec_master/ebin -pa /Users/romanshestakov/Development/Erlang/ec/lib/ec_web/deps/nitrogen_core/ebin
+
+
+for development:
+
+1. start ec12 in terminal
+./rel/ec12/bin/ec12 console
+
+2. start ec_web
+.start.sh
+
+3. sync:go(). at ec_web to make sure that changes are recompiled
+
+4. make changes from emacs, save, reload page at localhost:8000
