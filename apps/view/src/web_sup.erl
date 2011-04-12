@@ -97,7 +97,7 @@ add_extra_node(MasterNode) ->
     case mnesia:change_config(extra_db_nodes, [MasterNode] ) of
 	{ok, [_Node]} ->
 	    mnesia:add_table_copy(schema, node(), ram_copies),
-	    mnesia:add_table_copy(key_to_pid, node(), ram_copies),
+	    mnesia:add_table_copy(job, node(), ram_copies),
 	    Tables = mnesia:system_info(tables),
 	    mnesia:wait_for_tables(Tables, 5000),
 	    ok;
