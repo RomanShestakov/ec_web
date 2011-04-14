@@ -6,9 +6,9 @@ header(Selected) ->
     wf:wire(Selected, #add_class { class=selected }),
     #panel { class=menu, body=[
         #link { id=index, url='/', text="INDEX" },
-        #link { id=page1, url='/page1', text="PAGE 1" }
+        #link { id=page1, url='/page1', text="PAGE 1" },
+	#link { id=page1, url='/page2', text="PAGE 2" }
     ]}.
-
 
 footer() ->
     #panel { class=credits, body=[

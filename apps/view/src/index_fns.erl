@@ -16,3 +16,10 @@ select(RunDate, RegExpr) ->
 clean(RunDate, Name) ->
     io:format("Run Clean ~p ~p~n", [RunDate, Name]),
     ec_cli:clean_process(list_to_atom(RunDate), Name).
+
+get_svg(RunDate) ->
+    G = ec_cli:get_graph(list_to_atom(RunDate)),
+    D = digraphdot:get_svg(G),
+    %%io:format("Got SVG Data ~p ~p ~n", [RunDate, D]),
+    %%file:write_file("graph55.svg", D),
+    D.
