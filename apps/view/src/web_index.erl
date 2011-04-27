@@ -115,7 +115,10 @@ event(go) ->
 
 event(graph) ->
     RunDate = wf:q(dropdown1),
-    wf:session(run_date, RunDate);
+    wf:session(run_date, RunDate),
+    URL = "/page1/" ++ RunDate,
+    wf:redirect(URL);
+
     %%Query = wf:q(txt_query),
     %%Data =  index_fns:get_svg(RunDate).
     %% wf:content_type("image/png"),
