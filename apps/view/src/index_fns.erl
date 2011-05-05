@@ -9,10 +9,20 @@ get_schedule_rundates() ->
 
 select(RunDate, RegExpr) ->
     io:format("Run Select ~p ~p~n", [RunDate, RegExpr]),
-    S = ec_db:select(list_to_atom(RunDate), RegExpr),
-    P = ec_counter:start_counter(1),
-    [[{data, ec_counter:next(P)}, R#job.name, atom_to_list(R#job.run_date), atom_to_list(R#job.state)] || R <- S ].
+    G = ec_cli:get_graph(list_to_atom(RunDate)),
 
+    Vs = mdigraph:vertices(G),
+
+    %%?PRINT(Vs),
+
+    CC = [mdigraph:vertex(G, V) || V <- Vs],
+
+    %%?PRINT(CC),
+
+    %%S = ec_db:select(list_to_atom(RunDate), RegExpr),
+    P = ec_counter:start_counter(1),
+    [[{data, ec_counter:next(P)}, N, RunDate, atom_to_list(L#job.state)] || {N, L} <- CC , L =/= []].
+    
 clean(RunDate, Name) ->
     io:format("Run Clean ~p ~p~n", [RunDate, Name]),
     ec_cli:clean_process(list_to_atom(RunDate), Name).
