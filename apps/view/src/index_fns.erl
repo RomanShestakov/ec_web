@@ -21,10 +21,14 @@ select(RunDate, RegExpr) ->
 
     %%S = ec_db:select(list_to_atom(RunDate), RegExpr),
     P = ec_counter:start_counter(1),
-    [[{data, ec_counter:next(P)}, N, RunDate, atom_to_list(L#job.state),
-      L#job.start_time, L#job.end_time,
-      L#job.depends_on] || {N, L} <- VertexInfo, L =/= []].
-    
+    [[{data, ec_counter:next(P)}, N, RunDate, atom_to_list(L#fsm_state.state),
+      L#fsm_state.start_time, L#fsm_state.end_time,
+      n(L#fsm_state.parents)] || {N, L} <- VertexInfo, L =/= []].
+
+n(P) ->
+    {N, _D} = dict:to_list(P#fsm_state.parents),
+    N.
+
 clean(RunDate, Name) ->
     io:format("Run Clean ~p ~p~n", [RunDate, Name]),
     ec_cli:clean_process(list_to_atom(RunDate), Name).
