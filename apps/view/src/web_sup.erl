@@ -13,6 +13,7 @@
 routes() -> 
     [
         { "/page1", web_page1 },
+	{ "/web_page3", web_page3 },
         { "/", web_index },
 	%%{ "/page2", web_page2 },
         { "/nitrogen", static_file },
