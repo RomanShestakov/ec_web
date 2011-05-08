@@ -24,11 +24,9 @@ select(RunDate, RegExpr) ->
     %% [[{data, ec_counter:next(P)}, N, RunDate, atom_to_list(L#fsm_state.state),
     %%   L#fsm_state.start_time, L#fsm_state.end_time,
     %%   n(L#fsm_state.parents)] || {N, L} <- VertexInfo, L =/= []].
-    [[{data, ec_counter:next(P)}, N, "/page1/" ++ N, RunDate, atom_to_list(L#fsm_state.state),
-      L#fsm_state.start_time, L#fsm_state.end_time,
+    [[{data, ec_counter:next(P)}, N, "/web_page3/" ++ RunDate ++ "/" ++ N,
+      RunDate, atom_to_list(L#fsm_state.state), L#fsm_state.start_time, L#fsm_state.end_time,
       n(L)] || {N, L} <- VertexInfo, L =/= [], L#fsm_state.type =/= timer].
-
-
 
 n(P) ->
     [ N || {N, _D} <- dict:to_list(P#fsm_state.parents)].

@@ -5,9 +5,10 @@
 header(Selected) ->
     wf:wire(Selected, #add_class { class=selected }),
     #panel { class=menu, body=[
-        #link { id=index, url='/', text="INDEX" },
-        #link { id=page1, url='/page1', text="PAGE 1" },
-	#link { id=page1, url='/page2', text="PAGE 2" }
+        #link { id=index, url='/', text="INDEX" }
+        %#link { id=page1, url='/page1', text="PAGE 1" },
+	%%#link { id=page1, url='/page2', text="PAGE 2" },
+	%#link { id=page3, url='/page3', text="PAGE 3" }
     ]}.
 
 footer() ->
@@ -28,10 +29,14 @@ assert_path( Str ) when is_list( Str ) ->
 });
 
 assert_path( Elem=#template {} ) ->
-    case wf:path_info() of
-        [] -> Elem;
-        _ -> web_404:main()
-     end.
+       Elem.
+
+
+%% assert_path( Elem=#template {} ) ->
+%%     case wf:path_info() of
+%%         [] -> Elem;
+%%         _ -> web_404:main()
+%%      end.
 
 
 available_rundates() ->
