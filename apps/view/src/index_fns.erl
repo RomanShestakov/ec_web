@@ -12,24 +12,19 @@ select(RunDate, RegExpr) ->
     G = ec_cli:get_graph(list_to_atom(RunDate)),
     %% get all vertixes
     Vs = mdigraph:vertices(G),
-
-    %%?PRINT(Vs),
-
     VertexInfo = [mdigraph:vertex(G, V) || V <- Vs],
-
-    %%?PRINT(CC),
-
-    %%S = ec_db:select(list_to_atom(RunDate), RegExpr),
     P = ec_counter:start_counter(1),
-    %% [[{data, ec_counter:next(P)}, N, RunDate, atom_to_list(L#fsm_state.state),
-    %%   L#fsm_state.start_time, L#fsm_state.end_time,
-    %%   n(L#fsm_state.parents)] || {N, L} <- VertexInfo, L =/= []].
     [[{data, ec_counter:next(P)}, N, "/web_page3/" ++ RunDate ++ "/" ++ N,
       RunDate, atom_to_list(L#fsm_state.state), L#fsm_state.start_time, L#fsm_state.end_time,
-      n(L)] || {N, L} <- VertexInfo, L =/= [], L#fsm_state.type =/= timer].
+      get_parent_names(L)] || {N, L} <- VertexInfo, L =/= [], L#fsm_state.type =/= timer].
 
-n(P) ->
+get_parent_names(P) ->
     [ N || {N, _D} <- dict:to_list(P#fsm_state.parents)].
+
+select_node({Name, RunDate}) ->
+    io:format("Run Select ~p ~p~n", [RunDate, Name]),
+    G = ec_cli:get_graph(list_to_atom(RunDate)),
+    mdigraph:vertex(G, Name).
 
 clean(RunDate, Name) ->
     io:format("Run Clean ~p ~p~n", [RunDate, Name]),
