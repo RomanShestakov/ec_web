@@ -22,7 +22,7 @@ layout() ->
    % Argv = string:tokens(wf_context:path_info(), "/"),
     NameRundate = name_rundate_from_url(string:tokens(wf_context:path_info(), "/")),
     
-    {V, Rec} = index_fns:select_node(NameRundate),
+    {_V, Rec} = index_fns:select_node(NameRundate),
     ?PRINT({page3, Rec}),
 
     #grid_12 { body = #table{rows=[
