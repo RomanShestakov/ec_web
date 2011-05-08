@@ -21,13 +21,17 @@ select(RunDate, RegExpr) ->
 
     %%S = ec_db:select(list_to_atom(RunDate), RegExpr),
     P = ec_counter:start_counter(1),
-    [[{data, ec_counter:next(P)}, N, RunDate, atom_to_list(L#fsm_state.state),
+    %% [[{data, ec_counter:next(P)}, N, RunDate, atom_to_list(L#fsm_state.state),
+    %%   L#fsm_state.start_time, L#fsm_state.end_time,
+    %%   n(L#fsm_state.parents)] || {N, L} <- VertexInfo, L =/= []].
+    [[{data, ec_counter:next(P)}, N, "/page1/" ++ N, RunDate, atom_to_list(L#fsm_state.state),
       L#fsm_state.start_time, L#fsm_state.end_time,
-      n(L#fsm_state.parents)] || {N, L} <- VertexInfo, L =/= []].
+      n(L)] || {N, L} <- VertexInfo, L =/= [], L#fsm_state.type =/= timer].
+
+
 
 n(P) ->
-    {N, _D} = dict:to_list(P#fsm_state.parents),
-    N.
+    [ N || {N, _D} <- dict:to_list(P#fsm_state.parents)].
 
 clean(RunDate, Name) ->
     io:format("Run Clean ~p ~p~n", [RunDate, Name]),

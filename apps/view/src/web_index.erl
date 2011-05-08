@@ -38,12 +38,12 @@ layout() ->
 	#grid_12 { body = #panel{id=pnl_processes,
 	    class=mojorcontainer,
    	    body=[]}
-	},
-
-	#grid_12 { body = #panel{id=pnl_graph,
-	    class=mojorcontainer,
-   	    body=["graph_test"]}
 	}
+
+	%% #grid_12 { body = #panel{id=pnl_graph,
+	%%     class=mojorcontainer,
+   	%%     body=["graph_test"]}
+	%% }
 
     ]}.
 
@@ -63,7 +63,7 @@ build_process_table(Data,Map) ->
 	    #bind{id=tableBinding, data=Data, map=Map, transform=fun alternate_color/2, body=
 		#tablerow { id=top, cells= [
 		    #tablecell { class = col, body=#checkbox{}},
-		    #tablecell { class = col, id=name },
+		    #tablecell { class = col, body=#link{id=name}},
 		    #tablecell { class = col, id=rundate },
 		    #tablecell { class = col, id=state },
 		    #tablecell { class = col, id=start_time },
@@ -165,6 +165,7 @@ process_column_map() ->
     [
 	myButton@postback,
 	name@text, 
+	name@url,
 	rundate@text,
 	state@text,
 	start_time@text,
