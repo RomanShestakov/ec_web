@@ -47,8 +47,10 @@ layout() ->
 
     ]}.
 
+
 %% build table with process details
 build_process_table(Data,Map) ->
+    Map1 = [d_name@text, d_name@url],
     [
 	#table{id=tbl_processes, rows=[
 	    #tablerow{cells=[
@@ -68,11 +70,17 @@ build_process_table(Data,Map) ->
 		    #tablecell { class = col, id=state },
 		    #tablecell { class = col, id=start_time },
 		    #tablecell { class = col, id=end_time },
-		    #tablecell { class = col, id=depends_on }
+		    #tablecell { class = col, body = 
+			#table{rows=[#bind{id=depends_on, map=Map1, body=
+			    #tablerow{cells=[#tablecell{class = col, body=#link{id = d_name}}]}}]
+			}
+		    }
 		]}
 	    }
 	]}
     ].
+
+  
 
 actions() ->
     %%#p{},
@@ -170,7 +178,7 @@ process_column_map() ->
 	state@text,
 	start_time@text,
 	end_time@text,
-	depends_on@text
+	depends_on@data
     ].
 
 
