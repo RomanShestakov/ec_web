@@ -16,11 +16,11 @@ select(RunDate, RegExpr) ->
     P = ec_counter:start_counter(1),
     [[{data, ec_counter:next(P)}, N, "/web_page3/" ++ RunDate ++ "/" ++ N,
       RunDate, atom_to_list(L#fsm_state.state), L#fsm_state.start_time, L#fsm_state.end_time,
-      get_parent_names(L)
+      get_parent_names(L, RunDate)
     ] || {N, L} <- VertexInfo, L =/= [], L#fsm_state.type =/= timer].
 
-get_parent_names(P) ->
-    [[N,N] || {N, _D} <- dict:to_list(P#fsm_state.parents)].
+get_parent_names(P, RunDate) ->
+    [[N, "/web_page3/" ++ RunDate ++ "/" ++N] || {N, _D} <- dict:to_list(P#fsm_state.parents)].
 
 select_node({Name, RunDate}) ->
     io:format("Run Select ~p ~p~n", [RunDate, Name]),
