@@ -23,8 +23,8 @@ layout() ->
 	%% show query box 
 	#grid_12 { body = #table{rows=[
 	    #tablerow{class=row, cells=[
-		#tablecell{class=col, body=#label { text="Query", html_encode=true }},
-		#tablecell{class=col, body=#textbox { id=txt_query} },
+	%%	#tablecell{class=col, body=#label { text="Query", html_encode=true }},
+	%%	#tablecell{class=col, body=#textbox { id=txt_query} },
 		#tablecell{class=col, body=#button{id=btn_go, text="Go", postback=go}},
 		#tablecell{class=col, body=#button{id=btn_graph, text="Graph", postback=graph}}
 	    ]}
