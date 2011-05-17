@@ -9,7 +9,7 @@ rel: all
 
 compile:
 	./rebar compile
-	(cd apps/view/priv/static; rm -rf nitrogen; mkdir nitrogen; cp -r ../../../../deps/nitrogen_core/www/* nitrogen)
+	(cd apps/view/priv/static; rm -rf nitrogen; mkdir nitrogen; cp -r ../../../../deps/nitrogen_core/www/* nitrogen;cp -r ../*.gif nitrogen/.)
 
 clean:
 	./rebar clean

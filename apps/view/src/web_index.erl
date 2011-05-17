@@ -1,5 +1,7 @@
 -module (web_index).
 -include_lib ("nitrogen_core/include/wf.hrl").
+-include("elements.hrl").
+
 -compile(export_all).
             
 main() ->
@@ -50,7 +52,7 @@ layout() ->
 
 %% build table with process details
 build_process_table(Data,Map) ->
-    Map1 = [d_name@text, d_name@url],
+    MapList = [d_name@text, d_name@url],
     [
 	#table{id=tbl_processes, rows=[
 	    #tablerow{cells=[
@@ -70,16 +72,12 @@ build_process_table(Data,Map) ->
 		    #tablecell { class = col, id=state },
 		    #tablecell { class = col, id=start_time },
 		    #tablecell { class = col, id=end_time },
-		    #tablecell { class = col, body = 
-			#table{rows=[#bind{id=depends_on, map=Map1, body=
-			    #tablerow{cells=[#tablecell{class = col, body=#link{id = d_name}}]}}]
-			}
-		    }
+		    #tablecell { class = col, body = #collapsiblelist{collapsed = true, body =
+			#bind{id=depends_on, map=MapList, body=[#listitem{body = #link{id=d_name}}]}}}
 		]}
 	    }
 	]}
     ].
-
   
 
 actions() ->
@@ -183,3 +181,5 @@ process_column_map() ->
 
 
 
+collapsiblelist_event(Text) ->
+    ?PRINT(Text).
