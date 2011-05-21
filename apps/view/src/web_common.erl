@@ -39,13 +39,13 @@ assert_path( Elem=#template {} ) ->
 %%      end.
 
 
-available_rundates() ->
-    #panel { class=menu, body=[
-	#table{rows=[
-	    #tablerow{class=row, cells=[
-		#tablecell{class=col, body=[
-		    #dropdown { id=dropdown1, options=index_fns:get_schedule_rundates() }
-		]}
-	    ]}
-	]}
-    ]}.
+%% available_rundates() ->
+%%     #panel { class=menu, body=[
+%% 	#table{rows=[
+%% 	    #tablerow{class=row, cells=[
+%% 		#tablecell{class=col, body=[
+%% 		    #dropdown { id=dropdown1, options=index_fns:get_schedule_rundates() }
+%% 		]}
+%% 	    ]}
+%% 	]}
+%%     ]}.

@@ -5,7 +5,12 @@
 -compile(export_all).
             
 main() ->
-       web_common:assert_path( "grid.html" ).
+    case wf:role(admin) of
+	true ->
+	    web_common:assert_path( "grid.html" );
+	false ->
+	    wf:redirect_to_login("login")
+    end.
 
 title() -> "Nitrogen Web Framework for Erlang".
 
@@ -15,10 +20,11 @@ layout() ->
     %% binary_to_list(image_data()),
 
     #container_12 { body=[
-        #grid_12 { body="Welcome to Nitrogen" }
+        %%#grid_12 { body="Welcome to Nitrogen" }
 	
 	%% show dropbox with Rundates
-	#grid_12 { body = web_common:available_rundates()},
+	#grid_12 { body = #panel{body = [available_rundates()]}},
+
 
 	%% show query box 
 	#grid_12 { body = #table{rows=[
@@ -26,7 +32,8 @@ layout() ->
 	%%	#tablecell{class=col, body=#label { text="Query", html_encode=true }},
 	%%	#tablecell{class=col, body=#textbox { id=txt_query} },
 		#tablecell{class=col, body=#button{id=btn_go, text="Go", postback=go}},
-		#tablecell{class=col, body=#button{id=btn_graph, text="Graph", postback=graph}}
+		#tablecell{class=col, body=#button{id=btn_graph, text="Graph", postback=graph}},
+		#tablecell{class=col, body=#button{id=btn_logout, text="Logout", postback = logout}}
 	    ]}
 	    %% show tables with process control buttons
 	    %% #tablerow{class=row, cells=[
@@ -142,6 +149,10 @@ event(graph) ->
     %% 	       body =   Data, 
     %% 	       actions=#effect { effect=highlight }});
 
+event(logout) ->
+    wf:logout(),
+    wf:redirect("/");
+
 event(clean) ->
     RunDate = wf:q(dropdown1),
     index_fns:clean("bb/A", list_to_atom(RunDate)).
@@ -183,3 +194,14 @@ process_column_map() ->
 
 collapsiblelist_event(Text) ->
     ?PRINT(Text).
+
+
+available_rundates() ->
+    #panel { class=menu, body=[
+	#table{rows=[
+	    #tablerow{class=row, cells=[
+		#tablecell{class=col, body=[
+		    #dropdown { id=dropdown1, options=index_fns:get_schedule_rundates() }		]}
+	    ]}
+	]}
+    ]}.
