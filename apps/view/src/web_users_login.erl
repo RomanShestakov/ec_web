@@ -33,7 +33,8 @@ event(login) ->
     case users_db:validate_user(Name, Password) of
     	{valid, Role} ->
     	    wf:role(Role, true),
-    	    wf:redirect_from_login("/");
+    	    wf:redirect("/");
+	%%wf:redirect_from_login("/");
     	_ ->
     	    wf:flash("Incorrect login")
     end;
