@@ -37,6 +37,10 @@ layout() ->
 	#tablerow{class=row, cells=[
 	    #tablecell{class=col, body=#label { text="State", html_encode=true }},
 	    #tablecell{class=col, body=#label { text=Rec#fsm_state.state}}]
+	},
+	#tablerow{class=row, cells=[
+	    #tablecell{class=col, body=#label { text="ExitStatus", html_encode=true }},
+	    #tablecell{class=col, body=#label { text=wf:to_list(Rec#fsm_state.exit_status)}}]
 	}
     ]}}.
 
