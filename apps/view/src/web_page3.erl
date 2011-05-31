@@ -44,7 +44,7 @@ layout() ->
 	},
 	#tablerow{class=row, cells=[
 	    #tablecell{class=col, body=#label { text="Log", html_encode=true }},
-	    #tablecell{class=col, body=#link { text="log", url = "/web_page4" ++ Rec#fsm_state.logfile}}]
+	    #tablecell{class=col, body=#link { text="log", url = "/web_page4/" ++ Rec#fsm_state.logfile}}]
 	}
 
     ]}}.
