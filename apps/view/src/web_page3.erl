@@ -11,7 +11,7 @@
 
 main() ->
 %%    Name = string:tokens(wf_context:path_info(), "/"),
-    ?PRINT({main111, main}),
+    %%?PRINT({main111, main}),
     web_common:assert_path( "grid.html" ).
     
 %%main() -> #template { file="./site/templates/caster_grid.html" }.
@@ -23,7 +23,7 @@ layout() ->
     NameRundate = name_rundate_from_url(string:tokens(wf_context:path_info(), "/")),
     
     {_V, Rec} = index_fns:select_node(NameRundate),
-    ?PRINT({page3, Rec}),
+    %%?PRINT({logfile, Rec#fsm_state.logfile}),
 
     #grid_12 { body = #table{rows=[
 	#tablerow{class=row, cells=[
@@ -41,7 +41,12 @@ layout() ->
 	#tablerow{class=row, cells=[
 	    #tablecell{class=col, body=#label { text="ExitStatus", html_encode=true }},
 	    #tablecell{class=col, body=#label { text=wf:to_list(Rec#fsm_state.exit_status)}}]
+	},
+	#tablerow{class=row, cells=[
+	    #tablecell{class=col, body=#label { text="Log", html_encode=true }},
+	    #tablecell{class=col, body=#link { text="log", url = "/web_page4" ++ Rec#fsm_state.logfile}}]
 	}
+
     ]}}.
 
 event(_) -> ok.

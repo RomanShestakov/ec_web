@@ -14,6 +14,7 @@ routes() ->
     [
         { "/page1", web_page1 },
 	{ "/web_page3", web_page3 },
+	{ "/web_page4", web_page4 },
 	{ "/login", web_users_login },
         { "/", web_index },
 	%%{ "/page2", web_page2 },
