@@ -23,9 +23,10 @@ layout() ->
     LogFile = wf_context:path_info(),
     ?PRINT({logfile, LogFile}),
 
+    Root  = ec_app_helper:get_env(ec_web, logs_root),
     %%{ok, File} = file:open(LogFile, read),
 
-    {ok, Bin} = file:read_file(LogFile),
+    {ok, Bin} = file:read_file(filename:join(Root, LogFile)),
     %% {_V, Rec} = index_fns:select_node(NameRundate),
     ?PRINT({data, Bin}),
 
