@@ -20,13 +20,19 @@ title() -> "Nitrogen Web Framework for Erlang".
 
 layout() ->
    % Argv = string:tokens(wf_context:path_info(), "/"),
-    LogFile = wf_context:path_info(),
+    LogFile = string:join(string:tokens(wf_context:path_info(), "/"), "/"),
     ?PRINT({logfile, LogFile}),
 
     Root  = ec_cli:get_master_config(),%%ec_app_helper:get_env(ec_web, logs_root),
+    ?PRINT({log, Root}),
+    
+    FullPath = filename:join([Root, LogFile]),
+    ?PRINT({log, FullPath}),
     %%{ok, File} = file:open(LogFile, read),
+%%    L = filename:join(Root, LogFile),
 
-    {ok, Bin} = file:read_file(filename:join(Root, LogFile)),
+
+    {ok, Bin} = file:read_file(FullPath),
     %% {_V, Rec} = index_fns:select_node(NameRundate),
     ?PRINT({data, Bin}),
 
