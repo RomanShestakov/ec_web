@@ -23,7 +23,16 @@ layout() ->
     NameRundate = name_rundate_from_url(string:tokens(wf_context:path_info(), "/")),
     
     {_V, Rec} = index_fns:select_node(NameRundate),
-    %%?PRINT({logfile, Rec#fsm_state.logfile}),
+    ?PRINT({rec, Rec#fsm_state.logfile}),
+
+    %%LogUrl = "/web_page4/" ++ Rec#fsm_state.logfile,
+    ShowLog = 
+    case Rec#fsm_state.logfile of
+	undefined ->
+	    false;
+	_Other ->
+	    true
+    end,
 
     #grid_12 { body = #table{rows=[
 	#tablerow{class=row, cells=[
@@ -42,7 +51,7 @@ layout() ->
 	    #tablecell{class=col, body=#label { text="ExitStatus", html_encode=true }},
 	    #tablecell{class=col, body=#label { text=wf:to_list(Rec#fsm_state.exit_status)}}]
 	},
-	#tablerow{class=row, cells=[
+	#tablerow{class=row, show_if = ShowLog, cells=[
 	    #tablecell{class=col, body=#label { text="Log", html_encode=true }},
 	    #tablecell{class=col, body=#link { text="log", url = "/web_page4/" ++ Rec#fsm_state.logfile}}]
 	}
