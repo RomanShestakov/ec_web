@@ -12,14 +12,15 @@
 main() ->
 %%    Name = string:tokens(wf_context:path_info(), "/"),
     ?PRINT({main111, main}),
-    web_common:assert_path( "grid.html" ).
+    web_common:assert_path( "log_template.html" ).
     
 %%main() -> #template { file="./site/templates/caster_grid.html" }.
 
-title() -> "Nitrogen Web Framework for Erlang".
+%title() -> "Nitrogen Web Framework for Erlang".
 
 layout() ->
    % Argv = string:tokens(wf_context:path_info(), "/"),
+
     LogFile = string:join(string:tokens(wf_context:path_info(), "/"), "/"),
     ?PRINT({logfile, LogFile}),
 
@@ -38,7 +39,10 @@ layout() ->
 
     %%#literal { text="<b>This</b> is some <i>text</i>" }.
 
-    #literal { text=wf:html_encode(wf:to_list(Bin))}.
+    %%#literal { text=wf:html_encode(wf:to_list(Bin))}.
+
+    wf:content_type("text/plain"),
+    #literal { text=wf:to_list(Bin)}.
 
     %% #grid_12 { body = #table{rows=[
     %% 	#tablerow{class=row, cells=[
