@@ -1,6 +1,7 @@
 -module (element_collapsiblelist).
 -include_lib ("nitrogen_core/include/wf.hrl").
--include("elements.hrl").
+
+-include("../include/elements.hrl").
 
 -compile(export_all).
 

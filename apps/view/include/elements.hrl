@@ -1,2 +1,2 @@
--include_lib ("nitrogen_core/include/wf.hrl").
+-include_lib("nitrogen_core/include/wf.hrl").
 -record(collapsiblelist, {?ELEMENT_BASE(element_collapsiblelist), numbered = false, collapsed = false, body=[]}).

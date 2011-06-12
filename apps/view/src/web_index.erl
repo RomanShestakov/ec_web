@@ -35,13 +35,12 @@ layout() ->
 		#tablecell{class=col, body=#button{id=btn_graph, text="Graph", postback=graph}},
 		#tablecell{class=col, body=#button{id=btn_logout, text="Logout", postback = logout}}
 	    ]}
-	    %% show tables with process control buttons
+	    %%show tables with process control buttons
 	    %% #tablerow{class=row, cells=[
-	    %% 	#tablecell{class=col, body=  binary_to_list(image_data())}
-	    %% 	%% #tablecell{class=col, body=#button{id=btn_redo,text="Redo"}},
-	    %% 	%% #tablecell{class=col, body=#button{id=btn_cancel,text="Cancel"}}
-	    %% ]}	 
-				       
+	    %% 	%%#tablecell{class=col, body=  binary_to_list(image_data())}
+	    %% 	%%#tablecell{class=col, body=#button{id=btn_redo,text="Redo"}},
+	    %% 	%%#tablecell{class=col, body=#button{id=btn_cancel,text="Cancel"}}
+	    %% ]}
 	]}},
 	%% put empty panel to output process names
 	#grid_12 { body = #panel{id=pnl_processes,
