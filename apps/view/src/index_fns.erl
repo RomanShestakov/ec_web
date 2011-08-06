@@ -16,10 +16,18 @@ select(RunDate, RegExpr) ->
     P = ec_counter:start_counter(1),
     [[{data, ec_counter:next(P)}, N, "/web_page3/" ++ RunDate ++ "/" ++ N,
       RunDate, atom_to_list(L#fsm_state.state),  
-      ec_time_fns:time_to_string(L#fsm_state.start_time, L#fsm_state.date_offset),
-      ec_time_fns:time_to_string(L#fsm_state.end_time, L#fsm_state.date_offset),
+      format_time(L#fsm_state.start_time, L#fsm_state.date_offset),
+      format_time(L#fsm_state.end_time, L#fsm_state.date_offset),
       get_parent_names(L, RunDate)
     ] || {N, L} <- VertexInfo, L =/= [], L#fsm_state.type =/= timer].
+
+
+format_time(Time, Offset) ->
+    case ec_time_fns:time_to_string(Time, Offset) of
+	{error, incorrect_time_of_offset} -> "";
+	TimeStr -> TimeStr
+    end.
+	     
 
 get_parent_names(P, RunDate) ->
     [[N, "/web_page3/" ++ RunDate ++ "/" ++N] || {N, _D} <- dict:to_list(P#fsm_state.parents)].
