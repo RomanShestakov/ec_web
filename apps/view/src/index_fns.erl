@@ -30,7 +30,7 @@ format_time(Time, Offset) ->
 	     
 
 get_parent_names(P, RunDate) ->
-    [[N, "/web_page3/" ++ RunDate ++ "/" ++N] || {N, _D} <- dict:to_list(P#fsm_state.parents)].
+    [[N, "/web_page3/" ++ RunDate ++ "/" ++N] || {N, _D} <- dict:to_list(P#fsm_state.parents), N =/= ?DEFAULT_TIMER_NAME].
 
 select_node({Name, RunDate}) ->
     io:format("Run Select ~p ~p~n", [RunDate, Name]),
