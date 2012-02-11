@@ -21,18 +21,19 @@ title() -> "Nitrogen Web Framework for Erlang".
 layout() ->
    % Argv = string:tokens(wf_context:path_info(), "/"),
     NameRundate = name_rundate_from_url(string:tokens(wf_context:path_info(), "/")),
-    
+    ?PRINT({NameRundate}),    
+
     {_V, Rec} = index_fns:select_node(NameRundate),
-    ?PRINT({rec, Rec#fsm_state.logfile}),
+    ?PRINT({rec, Rec}),
 
     %%LogUrl = "/web_page4/" ++ Rec#fsm_state.logfile,
-    ShowLog = 
-    case Rec#fsm_state.logfile of
-	undefined ->
-	    false;
-	_Other ->
-	    true
-    end,
+    ShowLog = false,
+%%     case Rec#fsm_state.logfile of
+%% 	undefined ->
+%% 	    false;
+%% 	_Other ->
+%% 	    true
+%%     end,
 
     #grid_12 { body = #table{rows=[
 	#tablerow{class=row, cells=[
@@ -53,7 +54,7 @@ layout() ->
 	},
 	#tablerow{class=row, show_if = ShowLog, cells=[
 	    #tablecell{class=col, body=#label { text="Log", html_encode=true }},
-	    #tablecell{class=col, body=#link { text="log", url = "/web_page4/" ++ Rec#fsm_state.logfile}}]
+	    #tablecell{class=col, body=#link { text="log", url = "/web_page4/" ++ "logfile"}}]
 	}
 
     ]}}.
