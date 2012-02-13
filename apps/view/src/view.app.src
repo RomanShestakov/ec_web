@@ -8,7 +8,7 @@
                     {port,8000},
                     {server_name,web},
 		    {logs_root, "/home/ubuntu/Development/ec12/rel/ec12"},	
-                    {master_name, 'ec_master@127.0.0.1'}]},
+                    {master_name, 'ec_master@rs.home'}]},
               {modules,[basic_auth_callback_mod,ec_counter,index_fns,web_404,
                         web_app,web_common,web_index,web_page1,web_page2,
                         web_sup]}]}.
