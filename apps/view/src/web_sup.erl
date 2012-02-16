@@ -62,9 +62,9 @@ init([]) ->
     %% start ec_cli
     application:start(ec_cli),
    
-    {ok, LL}=ec_cli:config(MasterName),
+    %{ok, LL}=ec_cli:config(MasterName),
 
-    io:format("configure ec_cli for master: ~p, config ~p~n", [MasterName, LL]),
+    %io:format("configure ec_cli for master: ~p, config ~p~n", [MasterName, LL]),
     %% init db replication
     init_db(MasterName),
 
