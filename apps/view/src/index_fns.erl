@@ -4,12 +4,12 @@
 -include_lib("ec_master/include/record_definitions.hrl").
 
 get_schedule_rundates() ->
-    S = ec_cli:get_schedulers(),
-    [#option { text = atom_to_list(Date), value = Date } || {Date, _} <- S].
+    S = ec_db:get_names(), %ec_cli:get_schedulers(),
+    [#option { text = atom_to_list(Date), value = Date } || Date <- S].
 
 select(RunDate, RegExpr) ->
     io:format("Run Select ~p ~p~n", [RunDate, RegExpr]),
-    G = ec_cli:get_graph(list_to_atom(RunDate)),
+    G = ec_db:get_node(list_to_atom(RunDate)),
     %% get all vertixes
     Vs = mdigraph:vertices(G),
     VertexInfo = [mdigraph:vertex(G, V) || V <- Vs],
