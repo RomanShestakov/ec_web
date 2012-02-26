@@ -34,7 +34,7 @@ get_parent_names(P, RunDate) ->
 
 select_node({Name, RunDate}) ->
     io:format("Run Select ~p ~p~n", [RunDate, Name]),
-    G = ec_cli:get_graph(list_to_atom(RunDate)),
+    G = ec_db:get_node(list_to_atom(RunDate)),
     mdigraph:vertex(G, list_to_binary(Name)).
 
 clean(RunDate, Name) ->
@@ -42,7 +42,7 @@ clean(RunDate, Name) ->
     ec_cli:clean_process(list_to_atom(RunDate), Name).
 
 get_svg(RunDate) ->
-    G = ec_cli:get_graph(list_to_atom(RunDate)),
+    G = ec_db:get_node(list_to_atom(RunDate)),
     ec_digraphdot:get_svg(G).
     %%io:format("Got SVG Data ~p ~p ~n", [RunDate, D]),
     %%file:write_file("graph55.svg", D),
