@@ -10,7 +10,7 @@
 %% Helper macro for declaring children of supervisor
 -define(CHILD(I, Type), {I, {I, start_link, []}, permanent, 5000, Type, [I]}).
 
-routes() -> 
+routes() ->
     [
         { "/page1", web_page1 },
 	{ "/web_page3", web_page3 },
@@ -39,7 +39,7 @@ start_link() ->
 init([]) ->
     %% Start the Process Registry...
     application:start(nprocreg),
-    
+
     %% Start Mochiweb...
     application:load(mochiweb),
     {ok, BindAddress} = application:get_env(bind_address),
@@ -53,7 +53,7 @@ init([]) ->
     % Start Mochiweb...
     Options = [
         {name, ServerName},
-        {ip, BindAddress}, 
+        {ip, BindAddress},
         {port, Port},
         {loop, fun ?MODULE:loop/1}
     ],
@@ -61,13 +61,18 @@ init([]) ->
 
     %% start ec_cli
     application:start(ec_cli),
-   
+
     %{ok, LL}=ec_cli:config(MasterName),
 
     %io:format("configure ec_cli for master: ~p, config ~p~n", [MasterName, LL]),
     %% init db replication
-    init_db(MasterName),
-
+    case init_db(MasterName) of
+	ok ->
+	    io:format("succesfully replicated mnesia node ~p ~n", [MasterName]);
+	{error, Reason} ->
+	    io:format("faild for to replicate mnesia node: ~p ~n", [MasterName]),
+	    exit(Reason)
+    end,
 
     {ok, { {one_for_one, 5, 10}, []} }.
 
@@ -94,10 +99,12 @@ init_db(MasterNode) ->
     mnesia:start(),
     dynamic_db_init(MasterNode).
 
+
 dynamic_db_init(MasterNode) ->
     add_extra_node(MasterNode).
 
 add_extra_node(MasterNode) ->
+    io:format("Replicating mnesia node from(~s) ~n", [MasterNode]),
     case mnesia:change_config(extra_db_nodes, [MasterNode] ) of
 	{ok, [_Node]} ->
 	    mnesia:add_table_copy(schema, node(), ram_copies),
@@ -108,4 +115,4 @@ add_extra_node(MasterNode) ->
 	 Reason ->
 	    {err, Reason}
     end.
-	    
+
