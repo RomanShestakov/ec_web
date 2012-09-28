@@ -1,6 +1,8 @@
 -module(web_common).
--include_lib ("nitrogen_core/include/wf.hrl").
 -compile(export_all).
+
+-include_lib ("nitrogen_core/include/wf.hrl").
+-include("../include/ec_web.hrl").
 
 header(Selected) ->
     wf:wire(Selected, #add_class { class=selected }),
@@ -14,23 +16,22 @@ header(Selected) ->
 footer() ->
     #panel { class=credits, body=[
         "
-        Nitrogen is copyright &copy; 2008-2010 <a href='http://rklophaus.com'>Rusty Klophaus</a>. 
+        Nitrogen is copyright &copy; 2008-2010 <a href='http://rklophaus.com'>Rusty Klophaus</a>.
         <img src='/images/MiniSpaceman.png' style='vertical-align: middle;' />
         Released under the MIT License.
         "
     ]}.
 
 assert_path( Str ) when is_list( Str ) ->
-    assert_path( #template { 
-       file=filename:join([code:priv_dir(view), 
-			   "templates", 
+    assert_path( #template {
+       file=filename:join([code:priv_dir(?APP),
+			   "templates",
 			   Str
 			  ])
 });
 
 assert_path( Elem=#template {} ) ->
        Elem.
-
 
 %% assert_path( Elem=#template {} ) ->
 %%     case wf:path_info() of

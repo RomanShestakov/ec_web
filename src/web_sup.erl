@@ -7,6 +7,8 @@
     loop/1
 ]).
 
+-include("../include/ec_web.hrl").
+
 %% Helper macro for declaring children of supervisor
 -define(CHILD(I, Type), {I, {I, start_link, []}, permanent, 5000, Type, [I]}).
 
@@ -37,11 +39,11 @@ start_link() ->
 %% ===================================================================
 
 init([]) ->
-    %% Start the Process Registry...
-    application:start(nprocreg),
+    %% %% Start the Process Registry...
+    %% application:start(nprocreg),
 
-    %% Start Mochiweb...
-    application:load(mochiweb),
+    %% %% Start Mochiweb...
+    %% application:load(mochiweb),
     {ok, BindAddress} = application:get_env(bind_address),
     {ok, Port} = application:get_env(port),
     {ok, ServerName} = application:get_env(server_name),
@@ -59,8 +61,8 @@ init([]) ->
     ],
     mochiweb_http:start(Options),
 
-    %% start ec_cli
-    application:start(ec_cli),
+    %% %% start ec_cli
+    %% application:start(ec_cli),
 
     %{ok, LL}=ec_cli:config(MasterName),
 
@@ -91,7 +93,7 @@ loop(Req) ->
     nitrogen:run().
 
 docroot() ->
-    code:priv_dir(view) ++ "/static".
+    code:priv_dir(?APP) ++ "/static".
 
 init_db(MasterNode) ->
     mnesia:stop(),

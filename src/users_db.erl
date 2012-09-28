@@ -1,8 +1,10 @@
 -module(users_db).
 -compile(export_all).
 
+-include("../include/ec_web.hrl").
+
 validate_user(Username, Password) ->
-    {ok, Data} = file:consult( filename:join([code:priv_dir(view), "users_db" ])),
+    {ok, Data} = file:consult( filename:join([code:priv_dir(?APP), "users_db" ])),
     validate_user(Data, Username, Password).
 
 validate_user([], _Username, _Password) ->
