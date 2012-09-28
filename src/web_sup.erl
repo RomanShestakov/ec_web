@@ -50,7 +50,8 @@ init([]) ->
     {ok, MasterName} = application:get_env(master_name),
     DocRoot = docroot(),
 
-    io:format("Starting Mochiweb Server (~s) on ~s:~p, root: '~s'~n", [ServerName, BindAddress, Port, DocRoot]),
+    io:format("Starting Mochiweb Server (~s) on ~s:~p, root: '~s' master ~p~n",
+	[ServerName, BindAddress, Port, DocRoot, MasterName]),
 
     % Start Mochiweb...
     Options = [
