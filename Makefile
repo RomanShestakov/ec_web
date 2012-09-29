@@ -1,18 +1,15 @@
-REBAR=rebar
-
 all: get-deps compile
 
 get-deps:
-	$(REBAR) get-deps
+	rebar get-deps
 
 rel: all
-	$(REBAR) generate
-	#chmod u+x rel/ec_web/bin/ec_web
+	rebar generate
+	chmod u+x rel/ec_web/bin/ec_web
 
 compile:
-	$(REBAR) compile
-	#(cd priv/static; rm -rf nitrogen; mkdir nitrogen; cp -r ../../deps/nitrogen_core/www/* nitrogen)
+	rebar compile
+	(rm -rf priv/static/nitrogen; mkdir priv/static/nitrogen; cp -r deps/nitrogen_core/www/* priv/static/nitrogen/; cp -r priv/*.gif priv/static/nitrogen/.)
 
 clean:
-	$(REBAR) clean
-
+	rebar clean
