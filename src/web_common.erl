@@ -3,7 +3,8 @@
 -export([docroot/0, templates/0]).
 
 -include_lib ("nitrogen_core/include/wf.hrl").
--include("../include/ec_web.hrl").
+%% -include("../include/ec_web.hrl").
+-include_lib("ec_web/include/ec_web.hrl").
 
 
 docroot() ->

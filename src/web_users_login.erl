@@ -1,9 +1,11 @@
 -module (web_users_login).
--include_lib ("nitrogen_core/include/wf.hrl").
+-include_lib("nitrogen_core/include/wf.hrl").
+-include_lib("ec_web/include/ec_web.hrl").
+
 
 -compile(export_all).
 
-main() -> 
+main() ->
     web_common:assert_path( "grid.html" ).
 
 title() -> "Login".
@@ -15,7 +17,7 @@ layout() ->
     wf:wire(submit, password, #validate { validators=[
         #is_required { text="Required." }
     ]}),
-    
+
     #panel { style="margin: 50px;", body=[
 	#flash{},
 	#label { text="Login:" },

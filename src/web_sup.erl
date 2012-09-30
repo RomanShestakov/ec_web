@@ -7,7 +7,7 @@
     loop/1
 ]).
 
--include("../include/ec_web.hrl").
+-include_lib("ec_web/include/ec_web.hrl").
 
 %% Helper macro for declaring children of supervisor
 -define(CHILD(I, Type), {I, {I, start_link, []}, permanent, 5000, Type, [I]}).

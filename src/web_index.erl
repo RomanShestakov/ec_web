@@ -1,9 +1,11 @@
 -module (web_index).
 -include_lib ("nitrogen_core/include/wf.hrl").
--include("elements.hrl").
+%% -include("elements.hrl").
+-include_lib("ec_web/include/elements.hrl").
+
 
 -compile(export_all).
-            
+
 main() ->
     case wf:role(admin) of
 	true ->
@@ -21,12 +23,12 @@ layout() ->
 
     #container_12 { body=[
         %%#grid_12 { body="Welcome to Nitrogen" }
-	
+
 	%% show dropbox with Rundates
 	#grid_12 { body = #panel{body = [available_rundates()]}},
 
 
-	%% show query box 
+	%% show query box
 	#grid_12 { body = #table{rows=[
 	    #tablerow{class=row, cells=[
 	%%	#tablecell{class=col, body=#label { text="Query", html_encode=true }},
@@ -84,19 +86,19 @@ build_process_table(Data,Map) ->
 	    }
 	]}
     ].
-  
+
 
 actions() ->
     %%#p{},
     %%#label { id=lbl_rundate, text="Run Date", html_encode=true },
     %% rundate drop
     %% #dropdown { id=dropdown1, options=index_fns:get_schedule_rundates() },
-    
+
     %% #button { id=button, text="Click me!", postback=click },
     %%#label { id = label, text="Some text.", html_encode=true },
     %% %% generate table with running jobs
     %%  %%#table { rows= index_fns:get_jobs() },
-    
+
     %% #panel { body=[
     %% 		    #button { text="Clean", postback=clean }
     %% 		    %% #button { text="Redo", postback=redo },
@@ -113,13 +115,13 @@ actions() ->
 
 
 event(click) ->
- %%   Result = rpc:call('emacs@rs', ec_master, get_schedulers, []), 
+ %%   Result = rpc:call('emacs@rs', ec_master, get_schedulers, []),
 %%    wf:update(label, text = wf:f("Result ~p.", [Result])),
     RunDate = wf:q(dropdown1),
     Data = index_fns:get_jobs(RunDate),
 
-    wf:replace(button, #panel{ 
-    		 body = wf:f("~p", [Data]), 
+    wf:replace(button, #panel{
+    		 body = wf:f("~p", [Data]),
     		 actions=#effect { effect=highlight }});
 
 event(go) ->
@@ -128,7 +130,7 @@ event(go) ->
     Data = index_fns:select(RunDate, Query),
     ColumnMap = process_column_map(),
     wf:replace(pnl_processes, #panel{id=pnl_processes,
-	       body = build_process_table(Data, ColumnMap), 
+	       body = build_process_table(Data, ColumnMap),
 	       actions=#effect { effect=highlight }});
 
 event(graph) ->
@@ -145,7 +147,7 @@ event(graph) ->
     %%ColumnMap = process_column_map(),
     %% wf:content_type("image/svg+xml"),
     %% wf:replace(pnl_graph, #panel{id=pnl_graph,
-    %% 	       body =   Data, 
+    %% 	       body =   Data,
     %% 	       actions=#effect { effect=highlight }});
 
 event(logout) ->
@@ -177,10 +179,10 @@ alternate_color(DataRow, Acc) when Acc == even ->
     {DataRow, odd, {top@style, "background-color: #ddd;"}}.
 
 %% define fields of the process table
-process_column_map() -> 
+process_column_map() ->
     [
 	myButton@postback,
-	name@text, 
+	name@text,
 	name@url,
 	rundate@text,
 	state@text,
