@@ -19,12 +19,10 @@ routes() ->
 	{ "/web_page4", web_page4 },
 	{ "/login", web_users_login },
         { "/", web_index },
-	%%{ "/page2", web_page2 },
         { "/nitrogen", static_file },
         { "/css", static_file },
         { "/images", static_file },
         { "/js", static_file }
-
     ].
 
 %% ===================================================================
@@ -39,19 +37,15 @@ start_link() ->
 %% ===================================================================
 
 init([]) ->
-    %% %% Start the Process Registry...
-    %% application:start(nprocreg),
-
-    %% %% Start Mochiweb...
-    %% application:load(mochiweb),
     {ok, BindAddress} = application:get_env(bind_address),
     {ok, Port} = application:get_env(port),
     {ok, ServerName} = application:get_env(server_name),
     {ok, MasterName} = application:get_env(master_name),
-    DocRoot = docroot(),
+    DocRoot = web_common:docroot(),
+    Templates = web_common:templates(),
 
-    io:format("Starting Mochiweb Server (~s) on ~s:~p, root: '~s' master ~p~n",
-	[ServerName, BindAddress, Port, DocRoot, MasterName]),
+    io:format("Starting Mochiweb Server (~s) on ~s:~p, root: '~s' templates: '~s' master ~p~n",
+	[ServerName, BindAddress, Port, DocRoot, Templates, MasterName]),
 
     % Start Mochiweb...
     Options = [
@@ -62,12 +56,6 @@ init([]) ->
     ],
     mochiweb_http:start(Options),
 
-    %% %% start ec_cli
-    %% application:start(ec_cli),
-
-    %{ok, LL}=ec_cli:config(MasterName),
-
-    %io:format("configure ec_cli for master: ~p, config ~p~n", [MasterName, LL]),
     %% init db replication
     case init_db(MasterName) of
 	ok ->
@@ -76,11 +64,10 @@ init([]) ->
 	    io:format("faild for to replicate mnesia node: ~p ~n", [MasterName]),
 	    exit(Reason)
     end,
-
     {ok, { {one_for_one, 5, 10}, []} }.
 
 loop(Req) ->
-    DocRoot = docroot(),
+    DocRoot = web_common:docroot(),
     RequestBridge = simple_bridge:make_request(mochiweb_request_bridge, {Req, DocRoot}),
     ResponseBridge = simple_bridge:make_response(mochiweb_response_bridge, {Req, DocRoot}),
     nitrogen:init_request(RequestBridge, ResponseBridge),
@@ -90,11 +77,8 @@ loop(Req) ->
 
     %% Use a static handler for routing instead of the default dynamic handler.
     nitrogen:handler(named_route_handler, routes()),
-
     nitrogen:run().
 
-docroot() ->
-    code:priv_dir(?APP) ++ "/static".
 
 init_db(MasterNode) ->
     mnesia:stop(),
