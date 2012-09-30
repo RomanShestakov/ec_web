@@ -8,10 +8,10 @@
 
 
 docroot() ->
-    code:priv_dir(?APP) ++ "/static".
+    code:priv_dir(?WEBAPP) ++ "/static".
 
 templates() ->
-    code:priv_dir(?APP) ++ "/templates".
+    code:priv_dir(?WEBAPP) ++ "/templates".
 
 header(Selected) ->
     wf:wire(Selected, #add_class { class=selected }),

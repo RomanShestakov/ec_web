@@ -1,2 +1,2 @@
 %% application name
--define(APP, ec_web).
+-define(WEBAPP, ec_web).
