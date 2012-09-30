@@ -7,7 +7,7 @@
 	]).
 
 %% required apps for ec_master
--define(APPS, [nprocreg, mochiweb, ec_cli, ec_web]).
+-define(APPS, [nprocreg, mochiweb, ec_cli, sync, ec_web]).
 
 %% ===================================================================
 %% Application callbacks
