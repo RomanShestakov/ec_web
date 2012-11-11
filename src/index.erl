@@ -1,4 +1,4 @@
--module (web_index).
+-module (index).
 -include_lib ("nitrogen_core/include/wf.hrl").
 %% -include("elements.hrl").
 -include_lib("ec_web/include/elements.hrl").
@@ -6,13 +6,18 @@
 
 -compile(export_all).
 
+%% main() ->
+%%     case wf:role(admin) of
+%%     	true ->
+%% 	    web_common:assert_path( "grid.html" );
+%% 	false ->
+%% 	    wf:redirect_to_login("login")
+%%     end.
+
+
 main() ->
-    case wf:role(admin) of
-	true ->
-	    web_common:assert_path( "grid.html" );
-	false ->
-	    wf:redirect_to_login("login")
-    end.
+    web_common:assert_path( "grid.html" ).
+
 
 title() -> "Nitrogen Web Framework for Erlang".
 

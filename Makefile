@@ -9,7 +9,7 @@ rel: all
 
 compile:
 	rebar compile
-	(rm -rf priv/static/nitrogen; mkdir priv/static/nitrogen; cp -r deps/nitrogen_core/www/* priv/static/nitrogen/; cp -r priv/*.gif priv/static/nitrogen/.)
-
+	(rm -rf priv/static/nitrogen; mkdir priv/static/nitrogen; \
+	cp -r deps/nitrogen_core/www/* priv/static/nitrogen/; cp -r priv/*.gif priv/static/nitrogen/. ;)
 clean:
 	rebar clean
