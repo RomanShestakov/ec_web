@@ -70,7 +70,7 @@ dispatch() ->
      %% {["path","to","module2",'*'], ?MODULE, module_name_2}
      %% {["path","to","module3",'*'], ?MODULE, module_name_3}
      {["/"], nitrogen_webmachine, index},
-     {["/page1"], nitrogen_webmachine, web_page1},
+     {["/web_page1", "*"], nitrogen_webmachine, web_page1},
      {["/web_page3"], nitrogen_webmachine, web_page3},
      %% {["/web_samples_tabs1"], nitrogen_webmachine, web_samples_tabs1},
      {["/web_page4"], nitrogen_webmachine, web_page4},
