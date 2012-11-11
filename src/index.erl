@@ -1,8 +1,7 @@
 -module (index).
 -include_lib ("nitrogen_core/include/wf.hrl").
-%% -include("elements.hrl").
+-include_lib("nitrogen_elements/include/nitrogen_elements.hrl").
 -include_lib("ec_web/include/elements.hrl").
-
 
 -compile(export_all).
 
@@ -49,12 +48,31 @@ layout() ->
 	    %% 	%%#tablecell{class=col, body=#button{id=btn_cancel,text="Cancel"}}
 	    %% ]}
 	]}},
-	%% put empty panel to output process names
-	#grid_12 { body = #panel{id=pnl_processes,
-	    class=mojorcontainer,
-   	    body=[]}
-	}
+	%% %% put empty panel to output process names
+	%% #grid_12 { body = #panel{id=pnl_processes,
+	%%     class=mojorcontainer,
+   	%%     body=[]}
+	%% }
 
+	%% put empty panel to output process names
+	#grid_12 { body =
+	    #tabs{
+		id = tabs,
+		tag = tabs1,
+		options=[
+		    {selected, 0}
+		    %% {event, mouseover}
+		],
+		tabs=[
+		    #tab{title="Tab 1", body=[
+			#panel{id=pnl_processes,
+			    class=mojorcontainer,
+			    body=[]}
+		    ]},
+		    #tab{title="Tab 2", body=["Tab two body..."]}
+		]
+	    }
+	}
 	%% #grid_12 { body = #panel{id=pnl_graph,
 	%%     class=mojorcontainer,
    	%%     body=["graph_test"]}
@@ -143,7 +161,6 @@ event(graph) ->
     wf:session(run_date, RunDate),
     URL = "/page1/" ++ RunDate,
     wf:redirect(URL);
-
     %%Query = wf:q(txt_query),
     %%Data =  index_fns:get_svg(RunDate).
     %% wf:content_type("image/png"),
@@ -162,6 +179,10 @@ event(logout) ->
 event(clean) ->
     RunDate = wf:q(dropdown1),
     index_fns:clean("bb/A", list_to_atom(RunDate)).
+
+
+tabs_event(EventType, TabsTag, TabAnchor, TabPanel, TabIndex) ->
+    ?PRINT({tabs_event, EventType, TabsTag, TabAnchor, TabPanel, TabIndex}).
 
 
 %%% ALTERNATE CASE %%%
