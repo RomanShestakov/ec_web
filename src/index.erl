@@ -3,6 +3,8 @@
 -include_lib("nitrogen_elements/include/nitrogen_elements.hrl").
 -include_lib("ec_web/include/elements.hrl").
 
+-define(EVENT_TABSSHOW, 'tabsshow').
+
 -compile(export_all).
 
 %% main() ->
@@ -24,6 +26,8 @@ layout() ->
 
     %% wf:content_type("image/png"),
     %% binary_to_list(image_data()),
+    wf:wire(tabs, #tab_event_on{event = ?EVENT_TABSSHOW}),
+    wf:wire(#api{name=history_back, tag=f1}),
 
     #container_12 { body=[
         %%#grid_12 { body="Welcome to Nitrogen" }
@@ -135,7 +139,17 @@ actions() ->
 %%   %% Value.
 
 
+tabs_event(?EVENT_TABSSHOW, Tabs_Id, TabIndex) ->
+    wf:wire(wf:f("pushState(\"State ~s\", \"?state=~s\", {tabindex:~s});", [TabIndex, TabIndex, TabIndex])).
 
+api_event(history_back, _B, [[_,{data, Data}]]) ->
+    %% ?PRINT({history_back_event, B, Data}),
+    TabIndex = proplists:get_value(tabindex, Data),
+    wf:wire(tabs, #tab_event_off{event = ?EVENT_TABSSHOW}),
+    wf:wire(tabs, #tab_select{tab = TabIndex}),
+    wf:wire(tabs, #tab_event_on{event = ?EVENT_TABSSHOW});
+api_event(A, B, C) ->
+    ?PRINT(A), ?PRINT(B), ?PRINT(C).
 
 event(click) ->
  %%   Result = rpc:call('emacs@rs', ec_master, get_schedulers, []),
@@ -181,8 +195,8 @@ event(clean) ->
     index_fns:clean("bb/A", list_to_atom(RunDate)).
 
 
-tabs_event(EventType, TabsTag, TabAnchor, TabPanel, TabIndex) ->
-    ?PRINT({tabs_event, EventType, TabsTag, TabAnchor, TabPanel, TabIndex}).
+%% tabs_event(EventType, TabsTag, TabAnchor, TabPanel, TabIndex) ->
+%%     ?PRINT({tabs_event, EventType, TabsTag, TabAnchor, TabPanel, TabIndex}).
 
 
 %%% ALTERNATE CASE %%%
