@@ -49,7 +49,6 @@ layout() ->
 	%%     class=mojorcontainer,
    	%%     body=[]}
 	%% }
-
 	%% put empty panel to output process names
 	#grid_12 { body =
 	    #tabs{
@@ -57,7 +56,9 @@ layout() ->
 		tag = tabs1,
 		options = [{selected, 0}],
 		tabs = [
-		    #tab{title="Tab 1", body=[#panel{id=pnl_processes, class=mojorcontainer, body=[]}]},
+		    #tab{title="Tab 1", body=[#panel{id=pnl_processes, class=mojorcontainer, body=[
+			#process_table{id=tbl_process, data = []}
+		    ]}]},
 		    #tab{title="Tab 2", body=["Tab two body..."]}
 	]}}
     ]}.
@@ -103,9 +104,10 @@ event(go) ->
     RunDate = wf:q(dropdown1),
     Query = wf:q(txt_query),
     Data = index_fns:select(RunDate, Query),
-    wf:replace(pnl_processes, #panel{id=pnl_processes,
-	       body = #process_table{data = Data},
-	       actions=#effect { effect=highlight }});
+    %% wf:replace(pnl_processes, #panel{id=pnl_processes,
+    %% 	body = [#process_table{id=tbl_process, data = Data}],
+    %% 	actions=#effect { effect=highlight }});
+    wf:replace(tbl_process, #process_table{id=tbl_process, data = Data});
 
 event(graph) ->
     RunDate = wf:q(dropdown1),

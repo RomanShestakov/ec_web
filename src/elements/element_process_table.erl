@@ -19,9 +19,9 @@
 
 reflect() -> record_info(fields, process_table).
 
-render_element(#process_table{data = Data} = Record) ->
+render_element(#process_table{id = ID, data = Data} = Record) ->
     [
-	#table{id=tbl_processes, rows=[
+	#table{id=ID, rows=[
 	    #tablerow{cells=[
 		#tableheader { },
 		#tableheader { class = col, text="Name" },
