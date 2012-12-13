@@ -21,16 +21,12 @@ main() ->
 title() -> "Nitrogen Web Framework for Erlang".
 
 layout() ->
-
-    %% wf:content_type("image/png"),
-    %% binary_to_list(image_data()),
     wf:wire(tabs, #tab_event_on{event = ?EVENT_TABSSHOW}),
     wf:wire(#api{name=history_back, tag=f1}),
 
     #container_12 { body=[
 	%% show dropbox with Rundates
 	#grid_12 { body = #panel{body = [available_rundates()]}},
-
 
 	%% show query box
 	#grid_12 { body = #table{rows=[
@@ -59,20 +55,11 @@ layout() ->
 	    #tabs{
 		id = tabs,
 		tag = tabs1,
-		options=[
-		    {selected, 0}
-		    %% {event, mouseover}
-		],
-		tabs=[
-		    #tab{title="Tab 1", body=[
-			#panel{id=pnl_processes,
-			    class=mojorcontainer,
-			    body=[]}
-		    ]},
+		options = [{selected, 0}],
+		tabs = [
+		    #tab{title="Tab 1", body=[#panel{id=pnl_processes, class=mojorcontainer, body=[]}]},
 		    #tab{title="Tab 2", body=["Tab two body..."]}
-		]
-	    }
-	}
+	]}}
     ]}.
 
 actions() ->
