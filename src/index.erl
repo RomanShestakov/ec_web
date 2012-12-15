@@ -63,32 +63,39 @@ layout() ->
 	]}}
     ]}.
 
-actions() ->
-    %%#p{},
-    %%#label { id=lbl_rundate, text="Run Date", html_encode=true },
-    %% rundate drop
-    %% #dropdown { id=dropdown1, options=index_fns:get_schedule_rundates() },
+%% actions() ->
+%%     %%#p{},
+%%     %%#label { id=lbl_rundate, text="Run Date", html_encode=true },
+%%     %% rundate drop
+%%     %% #dropdown { id=dropdown1, options=index_fns:get_schedule_rundates() },
 
-    %% #button { id=button, text="Click me!", postback=click },
-    %%#label { id = label, text="Some text.", html_encode=true },
-    %% %% generate table with running jobs
-    %%  %%#table { rows= index_fns:get_jobs() },
+%%     %% #button { id=button, text="Click me!", postback=click },
+%%     %%#label { id = label, text="Some text.", html_encode=true },
+%%     %% %% generate table with running jobs
+%%     %%  %%#table { rows= index_fns:get_jobs() },
 
-    %% #panel { body=[
-    %% 		    #button { text="Clean", postback=clean }
-    %% 		    %% #button { text="Redo", postback=redo },
-    %% 		    %% #button { text="Kill", postback=kill }
-    %% 		   ]}.
-	#p{}.
+%%     %% #panel { body=[
+%%     %% 		    #button { text="Clean", postback=clean }
+%%     %% 		    %% #button { text="Redo", postback=redo },
+%%     %% 		    %% #button { text="Kill", postback=kill }
+%%     %% 		   ]}.
+%% 	#p{}.
 
 tabs_event(?EVENT_TABSSHOW, _Tabs_Id, TabIndex) ->
-    wf:wire(wf:f("pushState(\"State ~s\", \"?state=~s\", {tabindex:~s});", [TabIndex, TabIndex, TabIndex])).
+    RunDate = wf:q(dropdown1),
+    wf:wire(wf:f("pushState(\"State~s\", \"?date=~s&tab=~s\", {date:~s, tabindex:~s});",
+	[TabIndex, RunDate, TabIndex, RunDate, TabIndex])).
 
 api_event(history_back, _B, [[_,{data, Data}]]) ->
-    %% ?PRINT({history_back_event, B, Data}),
+    ?PRINT({history_back_event, _B, Data}),
+    RunDate = proplists:get_value(date, Data),
+    Query = wf:q(txt_query),
+    ?PRINT({run_date, RunDate}),
     TabIndex = proplists:get_value(tabindex, Data),
+    ProcessData = index_fns:select(RunDate, Query),
     wf:wire(tabs, #tab_event_off{event = ?EVENT_TABSSHOW}),
     wf:wire(tabs, #tab_select{tab = TabIndex}),
+    wf:replace(tbl_process, #process_table{id=tbl_process, data = ProcessData}),
     wf:wire(tabs, #tab_event_on{event = ?EVENT_TABSSHOW});
 api_event(A, B, C) ->
     ?PRINT(A), ?PRINT(B), ?PRINT(C).
@@ -103,11 +110,11 @@ event(click) ->
 event(go) ->
     RunDate = wf:q(dropdown1),
     Query = wf:q(txt_query),
-    Data = index_fns:select(RunDate, Query),
+    ProcessData = index_fns:select(RunDate, Query),
     %% wf:replace(pnl_processes, #panel{id=pnl_processes,
     %% 	body = [#process_table{id=tbl_process, data = Data}],
     %% 	actions=#effect { effect=highlight }});
-    wf:replace(tbl_process, #process_table{id=tbl_process, data = Data});
+    wf:replace(tbl_process, #process_table{id=tbl_process, data = ProcessData});
 
 event(graph) ->
     RunDate = wf:q(dropdown1),

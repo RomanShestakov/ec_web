@@ -23,14 +23,16 @@
     window.pushState = pushState;
 
     // Bind to StateChange Event
-    History.Adapter.bind(window, 'statechange', function(){ // Note: We are using statechange instead of popstate
-        var State = History.getState(); // Note: We are using History.getState() instead of event.state
+    // Note: We are using statechange instead of popstate
+    History.Adapter.bind(window, 'statechange', function() {
+	// Note: We are using History.getState() instead of event.state
+        var State = History.getState();
 	if(State.data.timestamp in timestamps)
 	    delete timestamps[State.data.timestamp];
 	else {
 	    // send postbacks to nitrogen page
 	    page.history_back(State.data);
-	    //console.log('backbutton fired!');
+	    console.log('backbutton fired!');
 	}
     })
 
