@@ -56,15 +56,11 @@ dispatch() ->
      {["css", '*'], static_resource, [{root, "./priv/static/css"}]},
      {["images", '*'], static_resource, [{root, "./priv/static/images"}]},
      {["nitrogen", '*'], static_resource, [{root, "./priv/static/nitrogen"}]},
-     %% {["content", '*'], static_resource, [{root, "./priv/content"}]},
-     %% {["history", '*'], static_resource, [{root, "./priv/history"}]},
-     %% {["jqgrid", '*'], static_resource, [{root, "./priv/static/jqgrid"}]},
-     %% {["content", '*'], static_resource, [{root, "./priv/content"}]},
+     {["jqgrid", '*'], static_resource, [{root, "./priv/static/jqgrid"}]},
      {["history", '*'], static_resource, [{root, "./priv/static/history"}]},
      %% %% {["/", '*.html'], static_resource, [{root, "./priv"}]},
      %% 	%{["bf_api", func, '*'], bf_api_web, []}.
-     %% {["get_jqgrid_data", '*'], get_jqgrid_data, []},
-
+     {["get_jqgrid_data", '*'], get_jqgrid_data, []},
 
      %% Add routes to your modules here. The last entry makes the
      %% system use the dynamic_route_handler, which determines the

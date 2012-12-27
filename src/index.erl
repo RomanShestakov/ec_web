@@ -54,9 +54,27 @@ layout() ->
 		options = [{selected, SelectedTab}],
 		tabs = [
 		    #tab{title="Tab 1", body=[#panel{id=pnl_processes, class=mojorcontainer, body=[
-			#process_table{id=tbl_process, data = Data}
-		    ]}]},
-		    #tab{title="Tab 2", body=["Tab two body..."]}
+			#process_table{id=tbl_process, data = Data}]}]},
+		    #tab{title="Tab 2", body=[
+			#jqgrid{
+			    id = jqgrid,
+			    options=[
+				{url, 'get_jqgrid_data'},
+				{datatype, <<"json">>},
+				{colNames, ['ID', 'Name', 'Values']},
+				{colModel, [
+				    [{name, 'id'}, {index, 'id'}, {width, 55}],
+				    [{name, 'name'}, {index, 'name1'}, {width, 80}],
+				    [{name, 'values1'}, {index, 'values1'}, {width, 100}]
+				]},
+				{rowNum, 10},
+				{rowList, [10, 20, 30]},
+				{sortname, 'id'},
+				{viewrecords, true},
+				{sortorder, <<"desc">>},
+				{caption, <<"JSON Example">>}
+			]}
+		    ]}
 	]}}
     ]}.
 
