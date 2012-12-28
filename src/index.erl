@@ -24,6 +24,9 @@ layout() ->
     wf:wire(tabs, #tab_event_on{event = ?EVENT_TABSSHOW}),
     wf:wire(#api{name=history_back, tag=f1}),
 
+    RunDate1 = "20121227",
+%%wf:q(dropdown1),
+
     Data = case wf:q(date) of
 	undefined -> [];
 	RunDate -> index_fns:select(RunDate, "")
@@ -33,6 +36,9 @@ layout() ->
 	undefined -> 0;
 	Tab -> Tab
     end,
+
+    Url = list_to_binary("get_graph_nodes/?date=" ++ RunDate1),
+    ?PRINT({run_date, Url}),
 
     #container_12 { body=[
 	%% show dropbox with Rundates
@@ -50,29 +56,37 @@ layout() ->
 	#grid_12 { body =
 	    #tabs{
 		id = tabs,
-		tag = tabs1,
 		options = [{selected, SelectedTab}],
+		style="margin:0;padding: 0 0 0 0;",
 		tabs = [
 		    #tab{title="Tab 1", body=[#panel{id=pnl_processes, class=mojorcontainer, body=[
 			#process_table{id=tbl_process, data = Data}]}]},
-		    #tab{title="Tab 2", body=[
+		    #tab{title="Tab 2",
+			style="margin:0; padding: 0 0 0 0;",
+			body=[
 			#jqgrid{
 			    id = jqgrid,
 			    options=[
-				{url, 'get_jqgrid_data'},
+				{url, Url},
 				{datatype, <<"json">>},
-				{colNames, ['ID', 'Name', 'Values']},
+				{colNames, ['Name', 'State']},
 				{colModel, [
-				    [{name, 'id'}, {index, 'id'}, {width, 55}],
-				    [{name, 'name'}, {index, 'name1'}, {width, 80}],
-				    [{name, 'values1'}, {index, 'values1'}, {width, 100}]
+				    [{name, 'name'}, {index, 'name'}, {width, 200}],
+				    %% [{name, 'date'}, {index, 'date'}, {width, 80}],
+				    [{name, 'state'}, {index, 'state'}, {width, 200}]
 				]},
-				{rowNum, 10},
-				{rowList, [10, 20, 30]},
-				{sortname, 'id'},
+				{rowNum, 30},
+				{rowList, [30, 50]},
+				{sortname, 'name'},
 				{viewrecords, true},
 				{sortorder, <<"desc">>},
-				{caption, <<"JSON Example">>}
+				%%{caption, <<"Processes">>},
+				{multiselect, true},
+				{autowidth, true},
+				%% {shrinkToFit, true},
+				{height, '100%'}
+				%% {width, 800},
+				%% {forceFit, true}
 			]}
 		    ]}
 	]}}

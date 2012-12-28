@@ -58,9 +58,8 @@ dispatch() ->
      {["nitrogen", '*'], static_resource, [{root, "./priv/static/nitrogen"}]},
      {["jqgrid", '*'], static_resource, [{root, "./priv/static/jqgrid"}]},
      {["history", '*'], static_resource, [{root, "./priv/static/history"}]},
-     %% %% {["/", '*.html'], static_resource, [{root, "./priv"}]},
-     %% 	%{["bf_api", func, '*'], bf_api_web, []}.
      {["get_jqgrid_data", '*'], get_jqgrid_data, []},
+     {["get_graph_nodes", '*'], get_graph_nodes, []},
 
      %% Add routes to your modules here. The last entry makes the
      %% system use the dynamic_route_handler, which determines the
