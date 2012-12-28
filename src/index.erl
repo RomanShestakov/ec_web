@@ -64,30 +64,32 @@ layout() ->
 		    #tab{title="Tab 2",
 			style="margin:0; padding: 0 0 0 0;",
 			body=[
-			#jqgrid{
-			    id = jqgrid,
-			    options=[
-				{url, Url},
-				{datatype, <<"json">>},
-				{colNames, ['Name', 'State']},
-				{colModel, [
-				    [{name, 'name'}, {index, 'name'}, {width, 200}],
-				    %% [{name, 'date'}, {index, 'date'}, {width, 80}],
-				    [{name, 'state'}, {index, 'state'}, {width, 200}]
-				]},
-				{rowNum, 30},
-				{rowList, [30, 50]},
-				{sortname, 'name'},
-				{viewrecords, true},
-				{sortorder, <<"desc">>},
-				%%{caption, <<"Processes">>},
-				{multiselect, true},
-				{autowidth, true},
-				%% {shrinkToFit, true},
-				{height, '100%'}
-				%% {width, 800},
-				%% {forceFit, true}
-			]}
+			    #jqgrid{
+				id = jqgrid,
+				options=[
+				    {url, Url},
+				    {datatype, <<"json">>},
+				    {colNames, ['Name', 'RunDate', 'State', 'Start Time', 'End Time']},
+				    {colModel, [
+					[{name, 'name'}, {index, 'name'}, {width, 80}],
+					[{name, 'date'}, {index, 'date'}, {width, 80}],
+					[{name, 'state'}, {index, 'state'}, {width, 80}],
+					[{name, 'start_time'}, {index, 'start_time'}, {width, 80}],
+					[{name, 'end_time'}, {index, 'end_time'}, {width, 80}]
+				    ]},
+				    {rowNum, 30},
+				    {rowList, [30, 50]},
+				    {sortname, 'name'},
+				    {viewrecords, true},
+				    {sortorder, <<"desc">>},
+				    %%{caption, <<"Processes">>},
+				    {multiselect, true},
+				    {autowidth, true},
+				    %% {shrinkToFit, true},
+				    {height, '100%'}
+				    %% {width, 800},
+				    %% {forceFit, true}
+			    ]}
 		    ]}
 	]}}
     ]}.
