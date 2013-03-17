@@ -5,7 +5,8 @@
 -include_lib("nitrogen_elements/include/nitrogen_elements.hrl").
 -include_lib("ec_web/include/elements.hrl").
 
--define(EVENT_TABSSHOW, 'tabsshow').
+-define(DATA, <<"digraph G {subgraph cluster_0 {style=filled;color=lightgrey; node [style=filled,color=white]; a0 -> a1 -> a2 -> a3;label = \"process #1\";} subgraph cluster_1 {node [style=filled]; b0 -> b1 -> b2 -> b3; label = \"process #2\";color=blue} start -> a0; start -> b0; a1 -> b3; b2 -> a3; a3 -> a0; a3 -> end; b3 -> end; start [shape=Mdiamond]; end [shape=Msquare];}">>).
+
 
 %% main() ->
 %%     case wf:role(admin) of
@@ -20,128 +21,213 @@ main() ->
 
 title() -> "Nitrogen Web Framework for Erlang".
 
+
 layout() ->
-    wf:wire(tabs, #tab_event_on{event = ?EVENT_TABSSHOW}),
-    wf:wire(#api{name=history_back, tag=f1}),
-
     RunDate1 = "20121227",
-%%wf:q(dropdown1),
-
-    Data = case wf:q(date) of
-	undefined -> [];
-	RunDate -> index_fns:select(RunDate, "")
-    end,
-
-    SelectedTab = case wf:q(tab) of
-	undefined -> 0;
-	Tab -> Tab
-    end,
-
     Url = list_to_binary("get_graph_nodes/?date=" ++ RunDate1),
+    %% Graph = ec_db:get_node(list_to_atom(RunDate1)),
+
+    %% %% Server = wf:q(server_txt),
+    %% Server = "ws://localhost:8000/websocket",
+    %% ?PRINT({viz_server, Server}),
+    %% wf:wire(#ws_open{server = Server, func = "function(event){console.log('open')};"}),
+    %% wf:wire(#ws_message{func = wf:f("function(event){var g = jQuery(obj('~s'));
+    %%                                            g.html(Viz(event.data, \"svg\"));
+    %% 	                                       g.find(\"svg\").width('100%');
+    %% 	                                       g.find(\"svg\").graphviz({status: true});};", [graph_viz])}),
+    %% wf:wire(#ws_error{func = "function(event){console.log('error')};"}),
+
     ?PRINT({run_date, Url}),
+    [
+	% Main layout...
+	#layout {
+	    %% add menubar for navigation
+	    north=#panel{id = north, body = [
+		#button{id = conn, text = "Connect", actions = [#event{type = click, postback = connect}]}
+	    ]},
+	    north_options = [{size, 60}, {spacing_open, 0}, {spacing_closed, 0}],
 
-    #container_12 { body=[
-	%% show dropbox with Rundates
-	#grid_12 { body = #panel{body = [available_rundates()]}},
+	    %% west=#panel{id = west, text = "West"},
+	    %% west_options=[{size, 200}, {spacing_open, 0}, {spacing_closed, 0}],
 
-	%% show query box
-	#grid_12 { body = #table{rows=[
-	    #tablerow{class=row, cells=[
-		#tablecell{class=col, body=#button{id=btn_go, text="Go", postback=go}},
-		#tablecell{class=col, body=#button{id=btn_graph, text="Graph", postback=graph}},
-		#tablecell{class=col, body=#button{id=btn_logout, text="Logout", postback = logout}}
-	    ]}
-	]}},
-	%% put empty panel to output process names
-	#grid_12 { body =
-	    #tabs{
-		id = tabs,
-		options = [{selected, SelectedTab}],
-		style="margin:0;padding: 0 0 0 0;",
-		tabs = [
-		    #tab{title="Tab 1", body=[#panel{id=pnl_processes, class=mojorcontainer, body=[
-			#process_table{id=tbl_process, data = Data}]}]},
-		    #tab{title="Tab 2",
-			style="margin:0; padding: 0 0 0 0;",
-			body=[
-			    #jqgrid{
-				id = jqgrid,
-				options=[
-				    {url, Url},
-				    {datatype, <<"json">>},
-				    {colNames, ['Name', 'RunDate', 'State', 'Start Time', 'End Time']},
-				    {colModel, [
-					[{name, 'name'}, {index, 'name'}, {width, 80}],
-					[{name, 'date'}, {index, 'date'}, {width, 80}],
-					[{name, 'state'}, {index, 'state'}, {width, 80}],
-					[{name, 'start_time'}, {index, 'start_time'}, {width, 80}],
-					[{name, 'end_time'}, {index, 'end_time'}, {width, 80}]
-				    ]},
-				    {rowNum, 30},
-				    {rowList, [30, 50]},
-				    {sortname, 'name'},
-				    {viewrecords, true},
-				    {sortorder, <<"desc">>},
-				    %%{caption, <<"Processes">>},
-				    {multiselect, true},
-				    {autowidth, true},
-				    %% {shrinkToFit, true},
-				    {height, '100%'}
-				    %% {width, 800},
-				    %% {forceFit, true}
-			    ]}
-		    ]}
-	]}}
-    ]}.
+	    center=#panel{id = center, body = [
+		#tabs{
+		    id = tabs,
+		    options = [{selected, 0}],
+		    style="margin:0;padding: 0 0 0 0;",
+		    tabs = [
+			#tab{title="Jobs",
+			    style="margin:0; padding: 0 0 0 0;",
+			    body=[
+				#jqgrid{
+				    id = jqgrid,
+				    options=[
+					{url, Url},
+					{datatype, <<"json">>},
+					{colNames, ['Name', 'RunDate', 'State', 'Start Time', 'End Time']},
+					{colModel, [
+					    [{name, 'name'}, {index, 'name'}, {width, 80}],
+					    [{name, 'date'}, {index, 'date'}, {width, 80}],
+					    [{name, 'state'}, {index, 'state'}, {width, 80}],
+					    [{name, 'start_time'}, {index, 'start_time'}, {width, 80}],
+					    [{name, 'end_time'}, {index, 'end_time'}, {width, 80}]
+					]},
+					{rowNum, 30},
+					{rowList, [30, 50, 80]},
+					{sortname, 'name'},
+					{viewrecords, true},
+					{sortorder, <<"desc">>},
+					%%{caption, <<"Processes">>},
+					{multiselect, true},
+					{autowidth, true},
+					{shrinkToFit, true},
+					{height, '100%'}
+					%% {width, '800'},
+					%% {forceFit, true}
+				]}
+			]},
+			#tab{title="Graph", body=[#viz{id = graph_viz, data = ec_digraphdot:generate_dot(ec_db:get_node(list_to_atom(RunDate1)))}]}
+			%% #tab{title="Graph", body=[#viz{id = graph_viz, data = ?DATA}]}
+		]}
+	    ]},
 
-tabs_event(?EVENT_TABSSHOW, _Tabs_Id, TabIndex) ->
-    RunDate = wf:q(dropdown1),
-    wf:wire(wf:f("pushState(\"State~s\", \"?date=~s&tab=~s\", {date:~s, tabindex:~s});",
-	[TabIndex, RunDate, TabIndex, RunDate, TabIndex])).
+	    east=#panel{id = east, text = "East"},
+	    east_options=[{size, 300}]
+	    %% east_options=[{size, 300}, {spacing_open, 0}, {spacing_closed, 0}]
 
-api_event(history_back, _B, [[_,{data, Data}]]) ->
-    ?PRINT({history_back_event, _B, Data}),
-    RunDate = proplists:get_value(date, Data),
-    Query = wf:q(txt_query),
-    ?PRINT({run_date, RunDate}),
-    TabIndex = proplists:get_value(tabindex, Data),
-    ProcessData = index_fns:select(RunDate, Query),
-    wf:wire(tabs, #tab_event_off{event = ?EVENT_TABSSHOW}),
-    wf:wire(tabs, #tab_select{tab = TabIndex}),
-    wf:replace(tbl_process, #process_table{id=tbl_process, data = ProcessData}),
-    wf:wire(tabs, #tab_event_on{event = ?EVENT_TABSSHOW});
-api_event(A, B, C) ->
-    ?PRINT(A), ?PRINT(B), ?PRINT(C).
+	    %% south=#panel{id = south, text = "South"},
+	    %% south_options=[{size, 30}, {spacing_open, 0}, {spacing_closed, 0}]
+	}
+    ].
 
-event(click) ->
-    RunDate = wf:q(dropdown1),
-    Data = index_fns:get_jobs(RunDate),
-    wf:replace(button, #panel{
-    		 body = wf:f("~p", [Data]),
-    		 actions=#effect { effect=highlight }});
 
-event(go) ->
-    RunDate = wf:q(dropdown1),
-    Query = wf:q(txt_query),
-    ProcessData = index_fns:select(RunDate, Query),
-    wf:replace(tbl_process, #process_table{id=tbl_process, data = ProcessData});
+event(connect) ->
+    %% Server = wf:q(server_txt),
+    %% ?PRINT({viz_server, Server}),
+    Server = "ws://localhost:8000/websocket",
+    wf:wire(#ws_open{server = Server, func = "function(event){console.log('open')};"}),
+    wf:wire(#ws_message{func = wf:f("function(event){var g = jQuery(obj('~s'));
+                                               g.html(Viz(event.data, \"svg\"));
+	                                       g.find(\"svg\").width('100%');
+	                                       g.find(\"svg\").graphviz({status: true});};", [graph_viz])}),
+    wf:wire(#ws_error{func = "function(event){console.log('error')};"}),
+    wf:replace(conn, #button{id = conn, text = "Disconnect", actions = [#event{type = click, postback = disconnect}]});
+event(disconnect) ->
+    wf:wire(#ws_close{}),
+    wf:replace(conn, #button{id = conn, text = "Connect", actions = [#event{type = click, postback = connect}]}).
 
-event(graph) ->
-    RunDate = wf:q(dropdown1),
-    wf:session(run_date, RunDate),
-    URL = "/web_page1/" ++ RunDate,
-    wf:redirect(URL).
+%% layout1() ->
+%%     wf:wire(tabs, #tab_event_on{type = ?EVENT_TABS_ACTIVATE}),
+%%     wf:wire(#api{name=history_back, tag=f1}),
+%%     RunDate1 = "20121227",
+%%     Url = list_to_binary("get_graph_nodes/?date=" ++ RunDate1),
+%%     ?PRINT({run_date, Url}),
 
-%% event(logout) ->
-%%     wf:logout(),
-%%     wf:redirect("/");
+%%     #container_12 { body=[
+%%     	%% show dropbox with Rundates
+%%     	#grid_12 { body = #panel{body = [available_rundates()]}},
 
-%% event(clean) ->
+%%     	%% show query box
+%%     	#grid_12 { body = #table{rows=[
+%%     	    #tablerow{class=row, cells=[
+%%     		#tablecell{class=col, body=#button{id=btn_go, text="Go", postback=go}},
+%%     		#tablecell{class=col, body=#button{id=btn_graph, text="Graph", postback=graph}},
+%%     		#tablecell{class=col, body=#button{id=btn_logout, text="Logout", postback = logout}}
+%%     	    ]}
+%%     	]}},
+%%     	%% put empty panel to output process names
+%%     	#grid_12 { body =
+%%     	    #tabs{
+%%     		id = tabs,
+%%     		options = [{selected, 0}],
+%%     		style="margin:0;padding: 0 0 0 0;",
+%%     		tabs = [
+%%     		    %% #tab{title="Tab 1", body=[#panel{id=pnl_processes, class=mojorcontainer, body=[
+%%     		    %% 	#process_table{id=tbl_process, data = Data}]}]},
+%%     		    #tab{title="Jobs",
+%%     			style="margin:0; padding: 0 0 0 0;",
+%%     			body=[
+%%     			    #jqgrid{
+%%     				id = jqgrid,
+%%     				options=[
+%%     				    {url, Url},
+%%     				    {datatype, <<"json">>},
+%%     				    {colNames, ['Name', 'RunDate', 'State', 'Start Time', 'End Time']},
+%%     				    {colModel, [
+%%     					[{name, 'name'}, {index, 'name'}, {width, 80}],
+%%     					[{name, 'date'}, {index, 'date'}, {width, 80}],
+%%     					[{name, 'state'}, {index, 'state'}, {width, 80}],
+%%     					[{name, 'start_time'}, {index, 'start_time'}, {width, 80}],
+%%     					[{name, 'end_time'}, {index, 'end_time'}, {width, 80}]
+%%     				    ]},
+%%     				    {rowNum, 50},
+%%     				    {rowList, [30, 50, 80]},
+%%     				    {sortname, 'name'},
+%%     				    {viewrecords, true},
+%%     				    {sortorder, <<"desc">>},
+%%     				    %%{caption, <<"Processes">>},
+%%     				    {multiselect, true},
+%%     				    {autowidth, true},
+%%     				    %% {shrinkToFit, true},
+%%     				    {height, '100%'}
+%%     				    %% {width, 800},
+%%     				    %% {forceFit, true}
+%%     			    ]}
+%%     		    ]}
+%% 	    ]}
+%% 	}
+%%     ]}.
+
+%    #label{text = "test"}.
+
+%% api_event(history_back, _B, [[_,{data, Data}]]) ->
+%%     ?PRINT({history_back_event, _B, Data}),
+%%     RunDate = proplists:get_value(date, Data),
+%%     Query = wf:q(txt_query),
+%%     ?PRINT({run_date, RunDate}),
+%%     TabIndex = proplists:get_value(tabindex, Data),
+%%     ProcessData = index_fns:select(RunDate, Query),
+%%     wf:wire(tabs, #tab_event_off{type = ?EVENT_TABS_ACTIVATE}),
+%%     wf:wire(tabs, #tab_select{tab = TabIndex}),
+%%     wf:replace(tbl_process, #process_table{id=tbl_process, data = ProcessData}),
+%%     wf:wire(tabs, #tab_event_on{type = ?EVENT_TABS_ACTIVATE});
+%% api_event(A, B, C) ->
+%%     ?PRINT(A), ?PRINT(B), ?PRINT(C).
+
+%% event(?EVENT_TABS_ACTIVATE, _Tabs_Id, TabIndex) ->
 %%     RunDate = wf:q(dropdown1),
-%%     index_fns:clean("bb/A", list_to_atom(RunDate)).
+%%     wf:wire(wf:f("pushState(\"State~s\", \"?date=~s&tab=~s\", {date:~s, tabindex:~s});",
+%% 	[TabIndex, RunDate, TabIndex, RunDate, TabIndex])).
 
-collapsiblelist_event(Text) ->
-    ?PRINT(Text).
+%% event(click) ->
+%%     RunDate = wf:q(dropdown1),
+%%     Data = index_fns:get_jobs(RunDate),
+%%     wf:replace(button, #panel{
+%%     		 body = wf:f("~p", [Data]),
+%%     		 actions=#effect { effect=highlight }});
+
+%% event(go) ->
+%%     RunDate = wf:q(dropdown1),
+%%     Query = wf:q(txt_query),
+%%     ProcessData = index_fns:select(RunDate, Query),
+%%     wf:replace(tbl_process, #process_table{id=tbl_process, data = ProcessData});
+
+%% event(graph) ->
+%%     RunDate = wf:q(dropdown1),
+%%     wf:session(run_date, RunDate),
+%%     URL = "/web_page1/" ++ RunDate,
+%%     wf:redirect(URL).
+
+%% %% event(logout) ->
+%% %%     wf:logout(),
+%% %%     wf:redirect("/");
+
+%% %% event(clean) ->
+%% %%     RunDate = wf:q(dropdown1),
+%% %%     index_fns:clean("bb/A", list_to_atom(RunDate)).
+
+%% collapsiblelist_event(Text) ->
+%%     ?PRINT(Text).
 
 available_rundates() ->
     #panel { class=menu, body=[

@@ -2,8 +2,6 @@
 
 -export([init/1, content_types_provided/2, to_json/2, generate_etag/2]).
 
--include_lib("webmachine/include/webmachine.hrl").
-
 init([]) -> {ok, undefined}.
 
 content_types_provided(ReqData, Context) ->
