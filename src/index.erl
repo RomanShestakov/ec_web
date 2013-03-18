@@ -42,13 +42,16 @@ layout() ->
 	% Main layout...
 	#layout {
 	    %% add menubar for navigation
-	    north=#panel{id = north, body = [
-		#button{id = conn, text = "Connect", actions = [#event{type = click, postback = connect}]}
-	    ]},
+	    north=#panel{id = north, text = "North"},
 	    north_options = [{size, 60}, {spacing_open, 0}, {spacing_closed, 0}],
 
 	    %% west=#panel{id = west, text = "West"},
-	    %% west_options=[{size, 200}, {spacing_open, 0}, {spacing_closed, 0}],
+	    west=#panel{id = west, body = [
+		control_panel(),
+		#p{},
+		#button{id = conn, text = "Connect", actions = [#event{type = click, postback = connect}]}
+	    ]},
+	    west_options=[{size, 200}, {spacing_open, 0}, {spacing_closed, 0}],
 
 	    center=#panel{id = center, body = [
 		#tabs{
@@ -66,7 +69,7 @@ layout() ->
 					{datatype, <<"json">>},
 					{colNames, ['Name', 'RunDate', 'State', 'Start Time', 'End Time']},
 					{colModel, [
-					    [{name, 'name'}, {index, 'name'}, {width, 80}],
+					    [{name, 'name'}, {index, 'name'}, {width, 150}],
 					    [{name, 'date'}, {index, 'date'}, {width, 80}],
 					    [{name, 'state'}, {index, 'state'}, {width, 80}],
 					    [{name, 'start_time'}, {index, 'start_time'}, {width, 80}],
@@ -79,9 +82,11 @@ layout() ->
 					{sortorder, <<"desc">>},
 					%%{caption, <<"Processes">>},
 					{multiselect, true},
-					{autowidth, true},
-					{shrinkToFit, true},
+					%% {autowidth, true},
+					%% {shrinkToFit, true},
 					{height, '100%'}
+					%% {setGridWidth, 800},
+					%%{forceFit, true},
 					%% {width, '800'},
 					%% {forceFit, true}
 				]}
@@ -89,16 +94,25 @@ layout() ->
 			#tab{title="Graph", body=[#viz{id = graph_viz, data = ec_digraphdot:generate_dot(ec_db:get_node(list_to_atom(RunDate1)))}]}
 			%% #tab{title="Graph", body=[#viz{id = graph_viz, data = ?DATA}]}
 		]}
-	    ]},
+	    ]}
 
-	    east=#panel{id = east, text = "East"},
-	    east_options=[{size, 300}]
+	    %% east=#panel{id = east, text = "East"},
+	    %% east_options=[{size, 300}]
 	    %% east_options=[{size, 300}, {spacing_open, 0}, {spacing_closed, 0}]
 
 	    %% south=#panel{id = south, text = "South"},
 	    %% south_options=[{size, 30}, {spacing_open, 0}, {spacing_closed, 0}]
 	}
     ].
+
+
+control_panel() ->
+    #panel{id=control_panel, body = [
+	#dropdown { id=dropdown1, options=index_fns:get_schedule_rundates()}
+	%% %% add button to disable tabs
+	%% #button{id=btn_disable, text="Disable All tabs", actions=[#event{type=click, postback={Tag, disable_tabs}}]},
+	%% #p{},
+    ]}.
 
 
 event(connect) ->
@@ -229,12 +243,12 @@ event(disconnect) ->
 %% collapsiblelist_event(Text) ->
 %%     ?PRINT(Text).
 
-available_rundates() ->
-    #panel { class=menu, body=[
-	#table{rows=[
-	    #tablerow{class=row, cells=[
-		#tablecell{class=col, body=[
-		    #dropdown { id=dropdown1, options=index_fns:get_schedule_rundates()}]}
-	    ]}
-	]}
-    ]}.
+%% available_rundates() ->
+%%     #panel { class=menu, body=[
+%% 	#table{rows=[
+%% 	    #tablerow{class=row, cells=[
+%% 		#tablecell{class=col, body=[
+%% 		    #dropdown { id=dropdown1, options=index_fns:get_schedule_rundates()}]}
+%% 	    ]}
+%% 	]}
+%%     ]}.
