@@ -22,15 +22,18 @@ main() ->
 title() -> "Nitrogen Web Framework for Erlang".
 
 layout() ->
-    RunDate1 = "20121227",
-    Url = list_to_binary("get_graph_nodes/?date=" ++ RunDate1),
+    Rundate = wf:q(rundates),
+
+    G = case Rundate of
+	    undefined -> undefined;
+	    Other -> ec_db:get_node(list_to_atom(Other))
+	end,
 
     %% action triggered on layout resize event to dynamically resize grid to fill parent container
     wf:wire(wf:f("function resizeGrid(pane, $pane, paneState){
                     var $contentDiv = $pane.find('.ui-widget-header');
                     $(obj('~s')).jqGrid('setGridWidth', $contentDiv.innerWidth() - 30, 'true')};", [jqgrid])),
 
-    ?PRINT({run_date, Url}),
     [
 	% Main layout...
 	#layout {
@@ -47,50 +50,20 @@ layout() ->
 	    west_options=[{size, 200}, {spacing_open, 0}, {spacing_closed, 0}],
 
 	    %% center panel of layout
-	    center=#panel{id=center, body=[
-		#tabs{
-		    id=tabs,
-		    options=[{selected, 0}],
-		    style="margin:0; padding: 0 0 0 0;",
-		    actions=[#tab_event_on{trigger = tabs, type = ?EVENT_TABS_ACTIVATE, actions = #alert { text="Hello" }}],
-		    tabs=[
-			#tab{title="Jobs",
-			    style="margin:0; padding: 0 0 0 -1;",
-			    body=[
-				#jqgrid{
-				    id=jqgrid,
-				    options=[
-					{url, Url},
-					{datatype, <<"json">>},
-					{colNames, ['Name', 'RunDate', 'State', 'Start Time', 'End Time']},
-					{colModel, [
-					    [{name, 'name'}, {index, 'name'}, {width, 150}],
-					    [{name, 'date'}, {index, 'date'}, {width, 80}],
-					    [{name, 'state'}, {index, 'state'}, {width, 80}],
-					    [{name, 'start_time'}, {index, 'start_time'}, {width, 80}],
-					    [{name, 'end_time'}, {index, 'end_time'}, {width, 80}]
-					]},
-					{rowNum, 30},
-					{rowList, [30, 50, 80]},
-					{sortname, 'name'},
-					{viewrecords, true},
-					{sortorder, <<"desc">>},
-					%%{caption, <<"Processes">>},
-					{multiselect, true},
-					%{shrinkToFit, true},
-					{height, '100%'},
-					%% {setGridWidth, 800},
-					%%{forceFit, true},
-					%% {width, '800'},
-					%%{forceFit, true}
-					{scrollOffset, 0}, %% switch off scrollbar
-					{autowidth, true} %% fill parent container on load
-				]}
-			]},
-			#tab{title="Graph", body=[#viz{id = graph_viz,
-			    data=ec_digraphdot:generate_dot(ec_db:get_node(list_to_atom(RunDate1)))}]}
+		center=#panel{id=center, body=[
+		    #tabs{
+			id=tabs,
+			options=[{selected, 0}],
+			style="margin:0; padding: 0 0 0 0;",
+			tabs=[
+			    #tab{title="Jobs",
+				style="margin:0; padding: 0 0 0 -1;",
+				body=[grid(Rundate)]},
+			    #tab{title="Graph",
+				body=[#viz{id = graph_viz, data = <<>>}]}
+				%% body=[#viz{id = graph_viz, data = ec_digraphdot:generate_dot(G)}]}
 		    ]}
-	    ]},
+		]},
 
 	    %% option to resize grid on layout size change
 	    %%center_options=[{onresize, resizeGrid}, {triggerEventOnLoad, true}]
@@ -105,13 +78,63 @@ layout() ->
 	}
     ].
 
-
 control_panel() ->
     #panel{id=control_panel, body = [
-	#dropdown { id=dropdown1, options=index_fns:get_schedule_rundates()}
-	%% %% add button to disable tabs
-	%% #button{id=btn_disable, text="Disable All tabs", actions=[#event{type=click, postback={Tag, disable_tabs}}]},
-	%% #p{},
+	#dropdown { id=rundates, options=index_fns:get_schedule_rundates()},
+	#button{id=run_btn, text="Run", actions=[#event{type=click, postback=go}]}
+    ]}.
+
+grid(undefined) ->
+    #jqgrid{
+	id=jqgrid,
+	options=[
+	    {datatype, <<"json">>},
+	    {colNames, ['Name', 'RunDate', 'State', 'Start Time', 'End Time']},
+	    {colModel, [
+		[{name, 'name'}, {index, 'name'}, {width, 150}],
+		[{name, 'date'}, {index, 'date'}, {width, 80}],
+		[{name, 'state'}, {index, 'state'}, {width, 80}],
+		[{name, 'start_time'}, {index, 'start_time'}, {width, 80}],
+		[{name, 'end_time'}, {index, 'end_time'}, {width, 80}]
+	    ]},
+	    {rowNum, 30},
+	    {rowList, [30, 50, 80]},
+	    {sortname, 'name'},
+	    {viewrecords, true},
+	    {sortorder, <<"desc">>},
+	    %%{caption, <<"Processes">>},
+	    {multiselect, true},
+	    %%{shrinkToFit, true},
+	    {height, '100%'},
+	    {scrollOffset, 0}, %% switch off scrollbar
+	    {autowidth, true} %% fill parent container on load
+    ]};
+grid(Rundate) ->
+    Url = list_to_binary("get_graph_nodes/?date=" ++ Rundate),
+    #jqgrid{
+	id=jqgrid,
+	options=[
+	    {url, Url},
+	    {datatype, <<"json">>},
+	    {colNames, ['Name', 'RunDate', 'State', 'Start Time', 'End Time']},
+	    {colModel, [
+		[{name, 'name'}, {index, 'name'}, {width, 150}],
+		[{name, 'date'}, {index, 'date'}, {width, 80}],
+		[{name, 'state'}, {index, 'state'}, {width, 80}],
+		[{name, 'start_time'}, {index, 'start_time'}, {width, 80}],
+		[{name, 'end_time'}, {index, 'end_time'}, {width, 80}]
+	    ]},
+	    {rowNum, 30},
+	    {rowList, [30, 50, 80]},
+	    {sortname, 'name'},
+	    {viewrecords, true},
+	    {sortorder, <<"desc">>},
+	    %%{caption, <<"Processes">>},
+	    {multiselect, true},
+	    %%{shrinkToFit, true},
+	    {height, '100%'},
+	    {scrollOffset, 0}, %% switch off scrollbar
+	    {autowidth, true} %% fill parent container on load
     ]}.
 
 
@@ -128,7 +151,7 @@ event(connect) ->
     wf:replace(conn, #button{id = conn, text = "Disconnect", actions = [#event{type = click, postback = disconnect}]});
 event(disconnect) ->
     wf:wire(#ws_close{}),
-    wf:replace(conn, #button{id = conn, text = "Connect", actions = [#event{type = click, postback = connect}]}).
+    wf:replace(conn, #button{id = conn, text = "Connect", actions = [#event{type = click, postback = connect}]});
 
 %% layout1() ->
 %%     wf:wire(tabs, #tab_event_on{type = ?EVENT_TABS_ACTIVATE}),
@@ -220,11 +243,45 @@ event(disconnect) ->
 %%     		 body = wf:f("~p", [Data]),
 %%     		 actions=#effect { effect=highlight }});
 
-%% event(go) ->
-%%     RunDate = wf:q(dropdown1),
-%%     Query = wf:q(txt_query),
-%%     ProcessData = index_fns:select(RunDate, Query),
-%%     wf:replace(tbl_process, #process_table{id=tbl_process, data = ProcessData});
+event(go) ->
+    Rundate = wf:q(rundates),
+    ?PRINT({run_go, Rundate}),
+    %% Query = wf:q(txt_query),
+    %% ProcessData = index_fns:select(RunDate, Query),
+    %% wf:replace(tbl_process, #process_table{id=tbl_process, data = ProcessData}).
+    %% wf:replace(jqgrid, grid(Rundate)).
+    Url = list_to_binary("get_graph_nodes/?date=" ++ Rundate),
+    wf:wire(wf:f("$(obj('~s')).jqGrid('setGridParam', {url : '~s'}).trigger(\"reloadGrid\");", [jqgrid, Url])).
+
+%%jQuery("#list").jqGrid().setGridParam({url : 'newUrl'}).trigger("reloadGrid")
+
+%%    wf:replace(jqgrid, #label{text="testjhfjhjh"}).
+    %% #jqgrid{
+    %% 	id=jqgrid,
+    %% 	options=[
+    %% 	    {url, Url},
+    %% 	    {datatype, <<"json">>},
+    %% 	    {colNames, ['Name', 'RunDate', 'State', 'Start Time', 'End Time']},
+    %% 	    {colModel, [
+    %% 		[{name, 'name'}, {index, 'name'}, {width, 150}],
+    %% 		[{name, 'date'}, {index, 'date'}, {width, 80}],
+    %% 		[{name, 'state'}, {index, 'state'}, {width, 80}],
+    %% 		[{name, 'start_time'}, {index, 'start_time'}, {width, 80}],
+    %% 		[{name, 'end_time'}, {index, 'end_time'}, {width, 80}]
+    %% 	    ]},
+    %% 	    {rowNum, 30},
+    %% 	    {rowList, [30, 50, 80]},
+    %% 	    {sortname, 'name'},
+    %% 	    {viewrecords, true},
+    %% 	    {sortorder, <<"desc">>},
+    %% 	    %%{caption, <<"Processes">>},
+    %% 	    {multiselect, true},
+    %% 	    %%{shrinkToFit, true},
+    %% 	    {height, '100%'},
+    %% 	    {scrollOffset, 0}, %% switch off scrollbar
+    %% 	    {autowidth, true} %% fill parent container on load
+    %% ]}).
+
 
 %% event(graph) ->
 %%     RunDate = wf:q(dropdown1),
