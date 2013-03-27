@@ -21,21 +21,14 @@ main() ->
 
 title() -> "Nitrogen Web Framework for Erlang".
 
-
 layout() ->
     RunDate1 = "20121227",
     Url = list_to_binary("get_graph_nodes/?date=" ++ RunDate1),
-    %% Graph = ec_db:get_node(list_to_atom(RunDate1)),
 
-    %% %% Server = wf:q(server_txt),
-    %% Server = "ws://localhost:8000/websocket",
-    %% ?PRINT({viz_server, Server}),
-    %% wf:wire(#ws_open{server = Server, func = "function(event){console.log('open')};"}),
-    %% wf:wire(#ws_message{func = wf:f("function(event){var g = jQuery(obj('~s'));
-    %%                                            g.html(Viz(event.data, \"svg\"));
-    %% 	                                       g.find(\"svg\").width('100%');
-    %% 	                                       g.find(\"svg\").graphviz({status: true});};", [graph_viz])}),
-    %% wf:wire(#ws_error{func = "function(event){console.log('error')};"}),
+    %% action triggered on layout resize event to dynamically resize grid to fill parent container
+    wf:wire(wf:f("function resizeGrid(pane, $pane, paneState){
+                    var $contentDiv = $pane.find('.ui-widget-header');
+                    $(obj('~s')).jqGrid('setGridWidth', $contentDiv.innerWidth() - 30, 'true')};", [jqgrid])),
 
     ?PRINT({run_date, Url}),
     [
@@ -53,17 +46,19 @@ layout() ->
 	    ]},
 	    west_options=[{size, 200}, {spacing_open, 0}, {spacing_closed, 0}],
 
-	    center=#panel{id = center, body = [
+	    %% center panel of layout
+	    center=#panel{id=center, body=[
 		#tabs{
-		    id = tabs,
-		    options = [{selected, 0}],
-		    style="margin:0;padding: 0 0 0 0;",
-		    tabs = [
+		    id=tabs,
+		    options=[{selected, 0}],
+		    style="margin:0; padding: 0 0 0 0;",
+		    actions=[#tab_event_on{trigger = tabs, type = ?EVENT_TABS_ACTIVATE, actions = #alert { text="Hello" }}],
+		    tabs=[
 			#tab{title="Jobs",
-			    style="margin:0; padding: 0 0 0 0;",
+			    style="margin:0; padding: 0 0 0 -1;",
 			    body=[
 				#jqgrid{
-				    id = jqgrid,
+				    id=jqgrid,
 				    options=[
 					{url, Url},
 					{datatype, <<"json">>},
@@ -82,23 +77,28 @@ layout() ->
 					{sortorder, <<"desc">>},
 					%%{caption, <<"Processes">>},
 					{multiselect, true},
-					%% {autowidth, true},
-					%% {shrinkToFit, true},
-					{height, '100%'}
+					%{shrinkToFit, true},
+					{height, '100%'},
 					%% {setGridWidth, 800},
 					%%{forceFit, true},
 					%% {width, '800'},
-					%% {forceFit, true}
+					%%{forceFit, true}
+					{scrollOffset, 0}, %% switch off scrollbar
+					{autowidth, true} %% fill parent container on load
 				]}
 			]},
-			#tab{title="Graph", body=[#viz{id = graph_viz, data = ec_digraphdot:generate_dot(ec_db:get_node(list_to_atom(RunDate1)))}]}
-			%% #tab{title="Graph", body=[#viz{id = graph_viz, data = ?DATA}]}
-		]}
-	    ]}
+			#tab{title="Graph", body=[#viz{id = graph_viz,
+			    data=ec_digraphdot:generate_dot(ec_db:get_node(list_to_atom(RunDate1)))}]}
+		    ]}
+	    ]},
+
+	    %% option to resize grid on layout size change
+	    %%center_options=[{onresize, resizeGrid}, {triggerEventOnLoad, true}]
+	    center_options=[{onresize, resizeGrid}]
 
 	    %% east=#panel{id = east, text = "East"},
 	    %% east_options=[{size, 300}]
-	    %% east_options=[{size, 300}, {spacing_open, 0}, {spacing_closed, 0}]
+	    %%east_options=[{size, 200}, {spacing_open, 0}, {spacing_closed, 0}]
 
 	    %% south=#panel{id = south, text = "South"},
 	    %% south_options=[{size, 30}, {spacing_open, 0}, {spacing_closed, 0}]
