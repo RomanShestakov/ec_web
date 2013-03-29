@@ -5,7 +5,7 @@
 -include_lib("nitrogen_elements/include/nitrogen_elements.hrl").
 -include_lib("ec_web/include/elements.hrl").
 
--define(DATA, <<"digraph G {subgraph cluster_0 {style=filled;color=lightgrey; node [style=filled,color=white]; a0 -> a1 -> a2 -> a3;label = \"process #1\";} subgraph cluster_1 {node [style=filled]; b0 -> b1 -> b2 -> b3; label = \"process #2\";color=blue} start -> a0; start -> b0; a1 -> b3; b2 -> a3; a3 -> a0; a3 -> end; b3 -> end; start [shape=Mdiamond]; end [shape=Msquare];}">>).
+%% -define(DATA, <<"digraph G {subgraph cluster_0 {style=filled;color=lightgrey; node [style=filled,color=white]; a0 -> a1 -> a2 -> a3;label = \"process #1\";} subgraph cluster_1 {node [style=filled]; b0 -> b1 -> b2 -> b3; label = \"process #2\";color=blue} start -> a0; start -> b0; a1 -> b3; b2 -> a3; a3 -> a0; a3 -> end; b3 -> end; start [shape=Mdiamond]; end [shape=Msquare];}">>).
 
 
 %% main() ->
@@ -28,6 +28,11 @@ layout() ->
 	    undefined -> undefined;
 	    Other -> ec_db:get_node(list_to_atom(Other))
 	end,
+
+    DotData = case G of
+		  undefined -> <<>>;
+		  G1 -> ec_digraphdot:generate_dot(G1)
+	      end,
 
     %% action triggered on layout resize event to dynamically resize grid to fill parent container
     wf:wire(wf:f("function resizeGrid(pane, $pane, paneState){
@@ -60,8 +65,7 @@ layout() ->
 				style="margin:0; padding: 0 0 0 -1;",
 				body=[grid(Rundate)]},
 			    #tab{title="Graph",
-				body=[#viz{id = graph_viz, data = <<>>}]}
-				%% body=[#viz{id = graph_viz, data = ec_digraphdot:generate_dot(G)}]}
+				body=[#panel{id=graph_viz}]}
 		    ]}
 		]},
 
@@ -139,9 +143,10 @@ grid(Rundate) ->
 
 
 event(connect) ->
-    %% Server = wf:q(server_txt),
+    Rundate = wf:q(rundates),
+    %% need to be a valid address of the web host
+    Server = "ws://rs.home:8000/websocket/?date=" ++ Rundate,
     %% ?PRINT({viz_server, Server}),
-    Server = "ws://localhost:8000/websocket",
     wf:wire(#ws_open{server = Server, func = "function(event){console.log('open')};"}),
     wf:wire(#ws_message{func = wf:f("function(event){var g = jQuery(obj('~s'));
                                                g.html(Viz(event.data, \"svg\"));
@@ -251,7 +256,20 @@ event(go) ->
     %% wf:replace(tbl_process, #process_table{id=tbl_process, data = ProcessData}).
     %% wf:replace(jqgrid, grid(Rundate)).
     Url = list_to_binary("get_graph_nodes/?date=" ++ Rundate),
-    wf:wire(wf:f("$(obj('~s')).jqGrid('setGridParam', {url : '~s'}).trigger(\"reloadGrid\");", [jqgrid, Url])).
+    G = case Rundate of
+    	undefined -> undefined;
+    	Other -> ec_db:get_node(list_to_atom(Other))
+    end,
+
+    DotData = case G of
+    	undefined -> <<>>;
+    	G1 -> ec_digraphdot:generate_dot(G1)
+    end,
+
+    %% ?PRINT({run_go, DotData}),
+
+    wf:wire(wf:f("$(obj('~s')).jqGrid('setGridParam', {url : '~s'}).trigger(\"reloadGrid\");", [jqgrid, Url])),
+    wf:replace(graph_viz, #viz{id = graph_viz, data = DotData}).
 
 %%jQuery("#list").jqGrid().setGridParam({url : 'newUrl'}).trigger("reloadGrid")
 
