@@ -88,31 +88,7 @@ control_panel() ->
 	#button{id=run_btn, text="Run", actions=[#event{type=click, postback=go}]}
     ]}.
 
-grid(undefined) ->
-    #jqgrid{
-	id=jqgrid,
-	options=[
-	    {datatype, <<"json">>},
-	    {colNames, ['Name', 'RunDate', 'State', 'Start Time', 'End Time']},
-	    {colModel, [
-		[{name, 'name'}, {index, 'name'}, {width, 150}],
-		[{name, 'date'}, {index, 'date'}, {width, 80}],
-		[{name, 'state'}, {index, 'state'}, {width, 80}],
-		[{name, 'start_time'}, {index, 'start_time'}, {width, 80}],
-		[{name, 'end_time'}, {index, 'end_time'}, {width, 80}]
-	    ]},
-	    {rowNum, 30},
-	    {rowList, [30, 50, 80]},
-	    {sortname, 'name'},
-	    {viewrecords, true},
-	    {sortorder, <<"desc">>},
-	    %%{caption, <<"Processes">>},
-	    {multiselect, true},
-	    %%{shrinkToFit, true},
-	    {height, '100%'},
-	    {scrollOffset, 0}, %% switch off scrollbar
-	    {autowidth, true} %% fill parent container on load
-    ]};
+grid(Rundate) when is_atom(Rundate) -> grid(atom_to_list(Rundate));
 grid(Rundate) ->
     Url = list_to_binary("get_graph_nodes/?date=" ++ Rundate),
     #jqgrid{
@@ -120,17 +96,19 @@ grid(Rundate) ->
 	options=[
 	    {url, Url},
 	    {datatype, <<"json">>},
-	    {colNames, ['Name', 'RunDate', 'State', 'Start Time', 'End Time']},
+	    {colNames, ['Name', 'Group', 'RunDate', 'State', 'Start Time', 'End Time', 'Dependency']},
 	    {colModel, [
 		[{name, 'name'}, {index, 'name'}, {width, 150}],
+		[{name, 'group'}, {index, 'group'}, {width, 80}],
 		[{name, 'date'}, {index, 'date'}, {width, 80}],
 		[{name, 'state'}, {index, 'state'}, {width, 80}],
 		[{name, 'start_time'}, {index, 'start_time'}, {width, 80}],
-		[{name, 'end_time'}, {index, 'end_time'}, {width, 80}]
+		[{name, 'end_time'}, {index, 'end_time'}, {width, 80}],
+		[{name, 'dependency'}, {index, 'dependency'}, {width, 80}]
 	    ]},
 	    {rowNum, 30},
 	    {rowList, [30, 50, 80]},
-	    {sortname, 'name'},
+	    %% {sortname, 'name'},
 	    {viewrecords, true},
 	    {sortorder, <<"desc">>},
 	    %%{caption, <<"Processes">>},
@@ -138,7 +116,10 @@ grid(Rundate) ->
 	    %%{shrinkToFit, true},
 	    {height, '100%'},
 	    {scrollOffset, 0}, %% switch off scrollbar
-	    {autowidth, true} %% fill parent container on load
+	    {autowidth, true}, %% fill parent container on load
+	    {sortname, 'group'},
+	    {grouping, true},
+	    {groupingView, {{groupField, ['group']}, {groupColumnShow, [true]}, {groupText, [<<"<b>{0} - {1} Item(s)</b>">>]}}}
     ]}.
 
 
