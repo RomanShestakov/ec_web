@@ -15,7 +15,6 @@ content_types_provided(Req, State) ->
 %%     {[{"application/json", to_json}], ReqData, Context}.
 to_json(Req, State) ->
     {Date, Req1} = cowboy_req:qs_val(<<"date">>, Req),
-    %% Date2 = list_to_atom(binary_to_list(Date)),
     Date2 = list_to_atom(binary_to_list(Date)),
     try
 	G = ec_db:get_node(Date2),
@@ -31,7 +30,7 @@ to_json(Req, State) ->
 					L#fsm_state.state,
 					list_to_binary(index_fns:format_time(L#fsm_state.start_time, L#fsm_state.date_offset)),
 					list_to_binary(index_fns:format_time(L#fsm_state.end_time, L#fsm_state.date_offset)),
-					<<"">>
+					get_parent_names(L, Date)
 				       ]}]}
 		|| {N, L} <- VertexInfo, L =/= [], L#fsm_state.type =/= timer],
 	%% add row information
@@ -46,10 +45,13 @@ to_json(Req, State) ->
 	throw:{error, Reason} -> {<<>>, Req1, State}
     end.
 
-
 make_link(N, Date) when is_binary(Date)-> make_link(N, binary_to_list(Date));
 make_link(N, Date) ->
     N1 = binary_to_list(N),
     list_to_binary("<a href='/web_page3/" ++ Date ++ "/" ++ N1 ++ "'>" ++ N1 ++ "</a>").
 
-%% generate_etag(ReqData, Context) -> {wrq:raw_path(ReqData), ReqData, Context}.
+get_parent_names(L, Date) when is_binary(Date)-> get_parent_names(L, binary_to_list(Date));
+get_parent_names(L, Date) ->
+    P = ["<a href='/web_page3/" ++ Date ++ "/" ++ binary_to_list(N) ++ "'>" ++ binary_to_list(N) ++ "</a>"
+	 || {N, _D} <- dict:to_list(L#fsm_state.parents), N =/= ?DEFAULT_TIMER_NAME],
+    list_to_binary(string:join(P, " ")).
