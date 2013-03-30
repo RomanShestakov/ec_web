@@ -100,11 +100,11 @@ grid(Rundate) ->
 	    {colModel, [
 		[{name, 'name'}, {index, 'name'}, {width, 150}],
 		[{name, 'group'}, {index, 'group'}, {width, 80}],
-		[{name, 'date'}, {index, 'date'}, {width, 80}],
-		[{name, 'state'}, {index, 'state'}, {width, 80}],
-		[{name, 'start_time'}, {index, 'start_time'}, {width, 80}],
-		[{name, 'end_time'}, {index, 'end_time'}, {width, 80}],
-		[{name, 'dependency'}, {index, 'dependency'}, {width, 80}]
+		[{name, 'date'}, {index, 'date'}, {width, 50}],
+		[{name, 'state'}, {index, 'state'}, {width, 50}],
+		[{name, 'start_time'}, {index, 'start_time'}, {width, 50}],
+		[{name, 'end_time'}, {index, 'end_time'}, {width, 50}],
+		[{name, 'dependency'}, {index, 'dependency'}, {width, 180}]
 	    ]},
 	    {rowNum, 30},
 	    {rowList, [30, 50, 80]},
@@ -119,7 +119,7 @@ grid(Rundate) ->
 	    {autowidth, true}, %% fill parent container on load
 	    {sortname, 'group'},
 	    {grouping, true},
-	    {groupingView, {{groupField, ['group']}, {groupColumnShow, [true]}, {groupText, [<<"<b>{0} - {1} Item(s)</b>">>]}}}
+	    {groupingView, {{groupField, ['group']}, {groupColumnShow, [false]}, {groupText, [<<"<b>{0} - {1} Item(s)</b>">>]}}}
     ]}.
 
 
