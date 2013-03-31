@@ -13,3 +13,4 @@ priv/static/*
 priv/plugins/*
 rel/ec_web/*
 test/ec_fsm_process_SUITE_data/*
+!priv/static/images
