@@ -178,16 +178,13 @@ event(go) ->
     end,
     wf:wire(wf:f("$(obj('~s')).jqGrid('setGridParam', {url: '~s'}).trigger(\"reloadGrid\");", [jqgrid, Url])),
     wf:replace(graph_viz, #viz{id = graph_viz, data = DotData});
-
-event(link_click) ->
-    ?PRINT({link_click});
 event(Event) ->
     ?PRINT({Event}).
 
 jqgrid_event(Event) ->
     wf:wire(wf:f("$(objs('~s')).click(function(event){event.preventDefault();
 	var linkTo = $(this).attr(\"href\");
-	$(\"<li><a href = \" + linkTo + \">\" + linkTo + \"</a></li>\").appendTo($(obj(\"\#\#~s > .ui-tabs-nav\")));
+	$(\"<li><a href = \" + linkTo + \">\" + linkTo.split(\"/\").slice(-1)[0] + \"</a></li>\").appendTo($(obj(\"\#\#~s > .ui-tabs-nav\")));
 	$(obj('~s')).tabs( \"refresh\");})", [deps_link, tabs, tabs])).
 
 %%jQuery("#list").jqGrid().setGridParam({url : 'newUrl'}).trigger("reloadGrid")
