@@ -24,15 +24,12 @@ title() -> "Nitrogen Web Framework for Erlang".
 layout() ->
     Rundate = wf:q(rundates),
 
-    G = case Rundate of
-	    undefined -> undefined;
-	    Other -> ec_db:get_node(list_to_atom(Other))
-	end,
 
-    DotData = case G of
-		  undefined -> <<>>;
-		  G1 -> ec_digraphdot:generate_dot(G1)
-	      end,
+    %%     wf:wire(tabs, #tab_event_on{type = ?EVENT_TABS_ACTIVATE}),
+    %%     wf:wire(#api{name=history_back, tag=f1}),
+
+
+    %% wf:wire(wf:f("$(objs('~s')).click(function(){alert('perform action here');})", [deps])),
 
     %% action triggered on layout resize event to dynamically resize grid to fill parent container
     wf:wire(wf:f("function resizeGrid(pane, $pane, paneState){
@@ -59,6 +56,7 @@ layout() ->
 		    #tabs{
 			id=tabs,
 			options=[{selected, 0}],
+		        actions = [#tab_cache{target = tabs}],
 			style="margin:0; padding: 0 0 0 0;",
 			tabs=[
 			    #tab{title="Jobs",
@@ -93,6 +91,7 @@ grid(Rundate) ->
     Url = list_to_binary("get_graph_nodes/?date=" ++ Rundate),
     #jqgrid{
 	id=jqgrid,
+	actions = [#jqgrid_event{trigger = jqgrid, target = jqgrid, type = ?ONLOADCOMPLETE, postback = on_load_complete}],
 	options=[
 	    {url, Url},
 	    {datatype, <<"json">>},
@@ -139,70 +138,6 @@ event(disconnect) ->
     wf:wire(#ws_close{}),
     wf:replace(conn, #button{id = conn, text = "Connect", actions = [#event{type = click, postback = connect}]});
 
-%% layout1() ->
-%%     wf:wire(tabs, #tab_event_on{type = ?EVENT_TABS_ACTIVATE}),
-%%     wf:wire(#api{name=history_back, tag=f1}),
-%%     RunDate1 = "20121227",
-%%     Url = list_to_binary("get_graph_nodes/?date=" ++ RunDate1),
-%%     ?PRINT({run_date, Url}),
-
-%%     #container_12 { body=[
-%%     	%% show dropbox with Rundates
-%%     	#grid_12 { body = #panel{body = [available_rundates()]}},
-
-%%     	%% show query box
-%%     	#grid_12 { body = #table{rows=[
-%%     	    #tablerow{class=row, cells=[
-%%     		#tablecell{class=col, body=#button{id=btn_go, text="Go", postback=go}},
-%%     		#tablecell{class=col, body=#button{id=btn_graph, text="Graph", postback=graph}},
-%%     		#tablecell{class=col, body=#button{id=btn_logout, text="Logout", postback = logout}}
-%%     	    ]}
-%%     	]}},
-%%     	%% put empty panel to output process names
-%%     	#grid_12 { body =
-%%     	    #tabs{
-%%     		id = tabs,
-%%     		options = [{selected, 0}],
-%%     		style="margin:0;padding: 0 0 0 0;",
-%%     		tabs = [
-%%     		    %% #tab{title="Tab 1", body=[#panel{id=pnl_processes, class=mojorcontainer, body=[
-%%     		    %% 	#process_table{id=tbl_process, data = Data}]}]},
-%%     		    #tab{title="Jobs",
-%%     			style="margin:0; padding: 0 0 0 0;",
-%%     			body=[
-%%     			    #jqgrid{
-%%     				id = jqgrid,
-%%     				options=[
-%%     				    {url, Url},
-%%     				    {datatype, <<"json">>},
-%%     				    {colNames, ['Name', 'RunDate', 'State', 'Start Time', 'End Time']},
-%%     				    {colModel, [
-%%     					[{name, 'name'}, {index, 'name'}, {width, 80}],
-%%     					[{name, 'date'}, {index, 'date'}, {width, 80}],
-%%     					[{name, 'state'}, {index, 'state'}, {width, 80}],
-%%     					[{name, 'start_time'}, {index, 'start_time'}, {width, 80}],
-%%     					[{name, 'end_time'}, {index, 'end_time'}, {width, 80}]
-%%     				    ]},
-%%     				    {rowNum, 50},
-%%     				    {rowList, [30, 50, 80]},
-%%     				    {sortname, 'name'},
-%%     				    {viewrecords, true},
-%%     				    {sortorder, <<"desc">>},
-%%     				    %%{caption, <<"Processes">>},
-%%     				    {multiselect, true},
-%%     				    {autowidth, true},
-%%     				    %% {shrinkToFit, true},
-%%     				    {height, '100%'}
-%%     				    %% {width, 800},
-%%     				    %% {forceFit, true}
-%%     			    ]}
-%%     		    ]}
-%% 	    ]}
-%% 	}
-%%     ]}.
-
-%    #label{text = "test"}.
-
 %% api_event(history_back, _B, [[_,{data, Data}]]) ->
 %%     ?PRINT({history_back_event, _B, Data}),
 %%     RunDate = proplists:get_value(date, Data),
@@ -231,11 +166,6 @@ event(disconnect) ->
 
 event(go) ->
     Rundate = wf:q(rundates),
-    ?PRINT({run_go, Rundate}),
-    %% Query = wf:q(txt_query),
-    %% ProcessData = index_fns:select(RunDate, Query),
-    %% wf:replace(tbl_process, #process_table{id=tbl_process, data = ProcessData}).
-    %% wf:replace(jqgrid, grid(Rundate)).
     Url = list_to_binary("get_graph_nodes/?date=" ++ Rundate),
     G = case Rundate of
     	undefined -> undefined;
@@ -246,11 +176,19 @@ event(go) ->
     	undefined -> <<>>;
     	G1 -> ec_digraphdot:generate_dot(G1)
     end,
+    wf:wire(wf:f("$(obj('~s')).jqGrid('setGridParam', {url: '~s'}).trigger(\"reloadGrid\");", [jqgrid, Url])),
+    wf:replace(graph_viz, #viz{id = graph_viz, data = DotData});
 
-    %% ?PRINT({run_go, DotData}),
+event(link_click) ->
+    ?PRINT({link_click});
+event(Event) ->
+    ?PRINT({Event}).
 
-    wf:wire(wf:f("$(obj('~s')).jqGrid('setGridParam', {url : '~s'}).trigger(\"reloadGrid\");", [jqgrid, Url])),
-    wf:replace(graph_viz, #viz{id = graph_viz, data = DotData}).
+jqgrid_event(Event) ->
+    wf:wire(wf:f("$(objs('~s')).click(function(event){event.preventDefault();
+	var linkTo = $(this).attr(\"href\");
+	$(\"<li><a href = \" + linkTo + \">\" + linkTo + \"</a></li>\").appendTo($(obj(\"\#\#~s > .ui-tabs-nav\")));
+	$(obj('~s')).tabs( \"refresh\");})", [deps_link, tabs, tabs])).
 
 %%jQuery("#list").jqGrid().setGridParam({url : 'newUrl'}).trigger("reloadGrid")
 

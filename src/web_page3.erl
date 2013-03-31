@@ -4,7 +4,7 @@
 
 -compile(export_all).
 
-%% main() -> 
+%% main() ->
 %%     Name = string:tokens(wf_context:path_info(), "/"),
 %%     ?PRINT({main111, Name}),
 %%     web_common:assert_path( "grid.html" ).
@@ -13,7 +13,7 @@ main() ->
 %%    Name = string:tokens(wf_context:path_info(), "/"),
     %%?PRINT({main111, main}),
     web_common:assert_path( "grid.html" ).
-    
+
 %%main() -> #template { file="./site/templates/caster_grid.html" }.
 
 title() -> "Nitrogen Web Framework for Erlang".
@@ -21,10 +21,10 @@ title() -> "Nitrogen Web Framework for Erlang".
 layout() ->
    % Argv = string:tokens(wf_context:path_info(), "/"),
     NameRundate = name_rundate_from_url(string:tokens(wf_context:path_info(), "/")),
-    ?PRINT({NameRundate}),    
+    %% ?PRINT({NameRundate}),
 
     {_V, Rec} = index_fns:select_node(NameRundate),
-    ?PRINT({rec, Rec}),
+    %% ?PRINT({rec, Rec}),
 
     %%LogUrl = "/web_page4/" ++ Rec#fsm_state.logfile,
     ShowLog = false,
@@ -34,36 +34,25 @@ layout() ->
 %% 	_Other ->
 %% 	    true
 %%     end,
-
-    #grid_12 { body = #table{rows=[
-	#tablerow{class=row, cells=[
-	    #tablecell{class=col, body=#label { text="Job Name", html_encode=true }},
-	    #tablecell{class=col, body=#label { text=Rec#fsm_state.name}}]
-	},
-	#tablerow{class=row, cells=[
-	    #tablecell{class=col, body=#label { text="Command", html_encode=true }},
-	    #tablecell{class=col, body=#label { text=Rec#fsm_state.command}}]
-	},
-	#tablerow{class=row, cells=[
-	    #tablecell{class=col, body=#label { text="State", html_encode=true }},
-	    #tablecell{class=col, body=#label { text=Rec#fsm_state.state}}]
-	},
-	#tablerow{class=row, cells=[
-	    #tablecell{class=col, body=#label { text="ExitStatus", html_encode=true }},
-	    #tablecell{class=col, body=#label { text=wf:to_list(Rec#fsm_state.exit_status)}}]
-	},
-	#tablerow{class=row, show_if = ShowLog, cells=[
-	    #tablecell{class=col, body=#label { text="Log", html_encode=true }},
-	    #tablecell{class=col, body=#link { text="log", url = "/web_page4/" ++ "logfile"}}]
-	}
-
-    ]}}.
+    #panel{body = [
+	#label { text="Job Name", html_encode=true },
+	#label { text=Rec#fsm_state.name },
+	#p{},
+	#label { text="Command", html_encode=true },
+    	#label { text=Rec#fsm_state.command},
+	#p{},
+    	#label { text="State", html_encode=true },
+    	#label { text=Rec#fsm_state.state},
+	#p{},
+	#label { text="ExitStatus", html_encode=true },
+    	#label { text=wf:to_list(Rec#fsm_state.exit_status)}
+    ]}.
 
 event(_) -> ok.
 
 name_rundate_from_url(Tokens) ->
     {string:join(tl(Tokens), "/"), hd(Tokens)}.
 
-    
+
 
 

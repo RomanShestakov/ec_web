@@ -52,6 +52,7 @@ make_link(N, Date) ->
 
 get_parent_names(L, Date) when is_binary(Date)-> get_parent_names(L, binary_to_list(Date));
 get_parent_names(L, Date) ->
-    P = ["<a href='/web_page3/" ++ Date ++ "/" ++ binary_to_list(N) ++ "'>" ++ binary_to_list(N) ++ "</a>"
+    P = ["<a href='/web_page3/" ++ Date ++ "/" ++ binary_to_list(N) ++ "'" ++ "class=wfid_deps_link" ++ ">"
+	 ++ binary_to_list(N) ++ "</a>"
 	 || {N, _D} <- dict:to_list(L#fsm_state.parents), N =/= ?DEFAULT_TIMER_NAME],
     list_to_binary(string:join(P, " ")).
