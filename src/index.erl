@@ -181,11 +181,35 @@ event(go) ->
 event(Event) ->
     ?PRINT({Event}).
 
+%% jqgrid_event(Event) ->
+%%     wf:wire(wf:f("$(objs('~s')).click(function(event){event.preventDefault();
+%% 	var linkTo = $(this).attr(\"href\");
+%% 	$(\"<li><a href = \" + linkTo + \">\" + linkTo.split(\"/\").slice(-1)[0] + \"</a></li>\").appendTo($(obj(\"\#\#~s .ui-tabs-nav\")));
+%% 	$(obj('~s')).tabs(); //annoyingly need to re-init the tabs
+%% 	$(obj('~s')).tabs(\"refresh\");
+%%     })", [deps_link, tabs, tabs, tabs])).
+
 jqgrid_event(Event) ->
     wf:wire(wf:f("$(objs('~s')).click(function(event){event.preventDefault();
 	var linkTo = $(this).attr(\"href\");
-	$(\"<li><a href = \" + linkTo + \">\" + linkTo.split(\"/\").slice(-1)[0] + \"</a></li>\").appendTo($(obj(\"\#\#~s > .ui-tabs-nav\")));
-	$(obj('~s')).tabs( \"refresh\");})", [deps_link, tabs, tabs])).
+	$(\"<li><a href = \" + linkTo + \">\" + linkTo.split(\"/\").slice(-1)[0] + \"</a></li>\").appendTo($(obj(\"\#\#~s .ui-tabs-nav\")));
+	$(obj('~s')).tabs(\"refresh\");
+    })", [deps_link, tabs, tabs])).
+
+
+%% jqgrid_event(Event) ->
+%%     wf:wire(wf:f("$(objs('~s')).click(function(event){event.preventDefault();
+%% 	var linkTo = $(this).attr(\"href\");
+%% 	$(\"<li><a href = /content/tabs2.htm > Tes </a></li>\").appendTo($(obj(\"\#\#~s .ui-tabs-nav\")));
+%% 	$(obj('~s')).tabs(\"refresh\");
+%%     })", [deps_link, tabs, tabs])).
+
+
+%% jqgrid_event(Event) ->
+%%     wf:wire(wf:f("$(objs('~s')).click(function(event){event.preventDefault();
+%% 	var linkTo = $(this).attr(\"href\");
+%% 	$(\"<li><a href = \" + linkTo + \">\" + linkTo.split(\"/\").slice(-1)[0] + \"</a></li>\").appendTo($(obj(\"\#\#~s > .ui-tabs-nav\")));
+%% 	$(obj('~s')).tabs( \"refresh\");})", [deps_link, tabs, tabs])).
 
 %%jQuery("#list").jqGrid().setGridParam({url : 'newUrl'}).trigger("reloadGrid")
 
