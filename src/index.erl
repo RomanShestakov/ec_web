@@ -52,20 +52,20 @@ layout() ->
 	    west_options=[{size, 200}, {spacing_open, 0}, {spacing_closed, 0}],
 
 	    %% center panel of layout
-		center=#panel{id=center, body=[
-		    #tabs{
-			id=tabs,
-			options=[{selected, 0}],
-		        actions = [#tab_cache{target = tabs}],
-			style="margin:0; padding: 0 0 0 0;",
-			tabs=[
-			    #tab{title="Jobs",
-				style="margin:0; padding: 0 0 0 -1;",
-				body=[grid(Rundate)]},
-			    #tab{title="Graph",
-				body=[#panel{id=graph_viz}]}
-		    ]}
-		]},
+	    center=#panel{id=center, body=[
+		#tabs{
+		    id=tabs,
+		    options=[{selected, 0}, {closable, true}],
+		    actions = [#tab_cache{target = tabs}],
+		    style="margin:0; padding: 0 0 0 0;",
+		    tabs=[
+			#tab{title="Jobs",
+			    style="margin:0; padding: 0 0 0 -1;",
+			    closable=false,
+			    body=[grid(Rundate)]},
+			#tab{title="Graph", closable=false, body=[#panel{id=graph_viz}]}
+		]}
+	    ]},
 
 	    %% option to resize grid on layout size change
 	    %%center_options=[{onresize, resizeGrid}, {triggerEventOnLoad, true}]
