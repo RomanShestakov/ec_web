@@ -14,33 +14,43 @@ content_types_provided(Req, State) ->
 %% content_types_provided(ReqData, Context) ->
 %%     {[{"application/json", to_json}], ReqData, Context}.
 to_json(Req, State) ->
-    {Date, Req1} = cowboy_req:qs_val(<<"date">>, Req),
-    Date2 = list_to_atom(binary_to_list(Date)),
+    %% get params from the query string
+    {Vals, Req1} = cowboy_req:qs_vals(Req),
+    Page = list_to_integer(binary_to_list(proplists:get_value(<<"page">>, Vals))),
+    RowsPerPage = list_to_integer(binary_to_list(proplists:get_value(<<"rows">>, Vals))),
+    Date = proplists:get_value(<<"date">>, Vals),
+
     try
-	G = ec_db:get_node(Date2),
+	G = ec_db:get_node(Date),
 	%% get all vertixes
 	Vs = mdigraph:vertices(G),
 	VertexInfo = lists:sort(fun({N1, _}, {N2, _}) -> N1 < N2 end, [mdigraph:vertex(G, V) || V <- Vs]),
 	P = ec_counter:start_counter(1),
 	%% format rows
 	Rows = [{struct, [{<<"id">>, ec_counter:next(P)},
-			  {<<"cell">>, [make_link(N, Date),
-					hd(binary:split(N, <<"~">>)),
-					Date,
-					L#fsm_state.state,
-					list_to_binary(index_fns:format_time(L#fsm_state.start_time, L#fsm_state.date_offset)),
-					list_to_binary(index_fns:format_time(L#fsm_state.end_time, L#fsm_state.date_offset)),
-					get_parent_names(L, Date)
-				       ]}]}
-		|| {N, L} <- VertexInfo, L =/= [], L#fsm_state.type =/= timer],
+	    {<<"cell">>, [make_link(N, Date),
+		hd(binary:split(N, <<"~">>)),
+		Date,
+		L#fsm_state.state,
+		list_to_binary(index_fns:format_time(L#fsm_state.start_time, L#fsm_state.date_offset)),
+		list_to_binary(index_fns:format_time(L#fsm_state.end_time, L#fsm_state.date_offset)),
+		get_parent_names(L, Date)
+	]}]}
+    || {N, L} <- VertexInfo, L =/= [], L#fsm_state.type =/= timer],
+	%% how many pages?
+	Total = case length(Rows) > 0 of
+	    true -> ec_util:ceiling(length(Rows) / RowsPerPage);
+	    false -> 0
+	end,
+
 	%% add row information
-	Data = {struct, [{<<"total">>, 1},
-			 {<<"page">>, 1},
-			 {<<"records">>, length(Rows)},
-			 {<<"rows">>, Rows}]},
+	Data = {struct, [
+	    {<<"page">>, Page},
+	    {<<"total">>, Total},
+	    {<<"records">>, length(Rows)},
+	    {<<"rows">>, lists:nthtail(Page * RowsPerPage - RowsPerPage, Rows)}]},
 	%% form json
-	Data1 = iolist_to_binary(mochijson2:encode(Data)),
-	{Data1, Req1, State}
+	{iolist_to_binary(mochijson2:encode(Data)), Req1, State}
     catch
 	throw:{error, Reason} -> {<<>>, Req1, State}
     end.
