@@ -27,16 +27,9 @@ start_link() ->
 
 init([]) ->
     {ok, Port} = application:get_env(port),
-    {ok, MasterName} = application:get_env(master_name),
 
-    %% init db replication
-    case db_api:init_db(MasterName) of
-	ok ->
-	    io:format("succesfully replicated mnesia node ~p ~n", [MasterName]);
-	{error, Reason} ->
-	    io:format("faild for to replicate mnesia node: ~p ~n", [MasterName]),
-	    exit(Reason)
-    end,
+    %% start a process to replicate mnesia from master
+    db_sync:start_link(),
 
     io:format("Starting Cowboy Server ~p ~n", [Port]),
     {ok, _} = cowboy:start_http(http, 100,
