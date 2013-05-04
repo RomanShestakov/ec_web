@@ -4,8 +4,12 @@
 -include_lib("ec_master/include/record_definitions.hrl").
 
 get_schedule_rundates() ->
-    S = ec_db:get_names(), %ec_cli:get_schedulers(),
-    [#option { text = atom_to_list(Date), value = Date } || Date <- S].
+    try
+	S = ec_db:get_names(), %ec_cli:get_schedulers(),
+	[#option { text = atom_to_list(Date), value = Date } || Date <- S]
+    catch
+	throw:_Reason -> [#option { text = "", value = "" }]
+    end.
 
 select(RunDate, RegExpr) when is_integer(RunDate) ->
     select(integer_to_list(RunDate), RegExpr);
@@ -48,6 +52,3 @@ clean(RunDate, Name) ->
 get_svg(RunDate) ->
     G = ec_db:get_node(list_to_atom(RunDate)),
     ec_digraphdot:get_svg(G).
-    %%io:format("Got SVG Data ~p ~p ~n", [RunDate, D]),
-    %%file:write_file("graph55.svg", D),
-    %%D.

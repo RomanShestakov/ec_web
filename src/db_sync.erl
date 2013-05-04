@@ -17,15 +17,16 @@
 -export([init/1, state_name/2, state_name/3, handle_event/3,
 	 handle_sync_event/4, handle_info/3, terminate/3, code_change/4]).
 
--export([check_resource/2,
-	 sync_resource/2]).
+-export([find_resource/2,
+	 sync_resource/2,
+	 keepalive_resource/2]).
 
 -define(SERVER, ?MODULE).
 -define(MASTER, ec_master).
 
 -include_lib("ec_master/include/record_definitions.hrl").
 
--record(state, {}).
+-record(state, {live_master}).
 
 %%%===================================================================
 %%% API
@@ -69,33 +70,50 @@ init([]) ->
     resource_discovery:add_target_resource_types([?MASTER]),
     %% scale time to milliseconds
     gen_fsm:send_event_after(10 * 1000, ?EVENT_TIME_IS_UP),
-    {ok, check_resource, #state{}}.
+    {ok, find_resource, #state{}}.
 
-check_resource(?EVENT_TIME_IS_UP, State) ->
-    log4erl:info("db_sync, checking resource ~p", [?MASTER]),
+find_resource(?EVENT_TIME_IS_UP, State) ->
+    %% check if we have a resource of the given type somewhere in the claster
     MasterNode = resource_discovery:get_resources(?MASTER),
-    log4erl:info("db_sync: resource: ~p", [MasterNode]),
+    log4erl:info("db_sync checking resource: ~p, found: ~p", [?MASTER, MasterNode]),
     case MasterNode of
 	[] ->
 	    %% no resources found, so go back to waiting
 	    gen_fsm:send_event_after(10 * 1000, ?EVENT_TIME_IS_UP),
-	    {next_state, check_resource, State};
+	    {next_state, find_resource, State};
 	Node ->
 	    gen_fsm:send_event(?SERVER, {sync, hd(Node)}),
 	    {next_state, sync_resource, State}
     end.
 
 sync_resource({sync, Node}, State) ->
-    log4erl:info("ec_task_distributer, checking task queue"),
+    log4erl:info("db_sync: replicating mnesia from node: ~p", [Node]),
     %% init db replication
     case add_node(Node) of
     	ok ->
-    	    io:format("succesfully replicated mnesia node ~p ~n", [Node]);
+    	    io:format("succesfully replicated mnesia node ~p ~n", [Node]),
+	    gen_fsm:send_event_after(30 * 1000, ?EVENT_TIME_IS_UP),
+	    {next_state, keepalive_resource, State};
     	{error, Reason} ->
     	    io:format("failed for to replicate mnesia node: ~p ~n", [Node]),
-	    gen_fsm:send_event_after(10 * 1000, ?EVENT_TIME_IS_UP)
-    end,
-   {next_state, check_resource, State}.
+	    gen_fsm:send_event_after(10 * 1000, ?EVENT_TIME_IS_UP),
+	    {next_state, find_resource, State}
+    end.
+
+keepalive_resource(?EVENT_TIME_IS_UP, State) ->
+    log4erl:info("db_sync keepalive"),
+    NofResource = resource_discovery:get_num_resource(?MASTER),
+    case NofResource of
+    	0 ->
+    	    io:format("db_sync: master node is lost, cleaning schema ~n"),
+	    init_db(),
+	    gen_fsm:send_event_after(10 * 1000, ?EVENT_TIME_IS_UP),
+	    {next_state, find_resource, State};
+	Other ->
+	    io:format("db_sync: master is alive ~n"),
+	    gen_fsm:send_event_after(30 * 1000, ?EVENT_TIME_IS_UP),
+	    {next_state, keepalive_resource, State}
+    end.
 
 %%--------------------------------------------------------------------
 %% @private

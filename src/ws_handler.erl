@@ -38,8 +38,12 @@ websocket_handle(_Data, Req, State) ->
 
 websocket_info({timeout, _Ref, Msg}, Req, #state{rundate = Rundate} = State) ->
     io:format(" rendate1 :~p ~n", [Rundate]),
-    erlang:start_timer(1500, self(), ec_digraphdot:generate_dot(ec_db:get_node(Rundate))),
-    {reply, {text, Msg}, Req, State};
+    try
+	erlang:start_timer(1500, self(), ec_digraphdot:generate_dot(ec_db:get_node(Rundate))),
+	{reply, {text, Msg}, Req, State}
+    catch
+	throw:{error, Reason} -> {reply, {text, term_to_binary(Reason)}, Req, State}
+    end;
 websocket_info(_Info, Req, State) ->
     {ok, Req, State}.
 
