@@ -12,8 +12,6 @@
 %% Helper macro for declaring children of supervisor
 -define(CHILD(I, Type), {I, {I, start_link, []}, permanent, 5000, Type, [I]}).
 
--define(APP, ec_web).
-
 %% ===================================================================
 %% API functions
 %% ===================================================================
@@ -41,14 +39,14 @@ dispatch_rules() ->
     cowboy_router:compile(
 	%% {Host, list({Path, Handler, Opts})}
 	[{'_', [
-	    {["/favicon.ico"], cowboy_static, [{directory, {priv_dir, ?APP, [<<"static">>]}}, {file, "images/favicon.ico"}]},
-	    {["/content/[...]"], cowboy_static, [{directory, {priv_dir, ?APP, [<<"content">>]}},
+	    {["/favicon.ico"], cowboy_static, [{directory, {priv_dir, ?WEBAPP, [<<"static">>]}}, {file, "images/favicon.ico"}]},
+	    {["/content/[...]"], cowboy_static, [{directory, {priv_dir, ?WEBAPP, [<<"content">>]}},
 		{mimetypes, {fun mimetypes:path_to_mimes/2, default}}]},
-	    {["/static/[...]"], cowboy_static, [{directory, {priv_dir, ?APP, [<<"static">>]}},
+	    {["/static/[...]"], cowboy_static, [{directory, {priv_dir, ?WEBAPP, [<<"static">>]}},
 		{mimetypes, {fun mimetypes:path_to_mimes/2, default}}]},
-	    {["/[:page/:date/:job/]plugins/[...]"], cowboy_static, [{directory, {priv_dir, ?APP, [<<"plugins">>]}},
+	    {["/[:page/:date/:job/]plugins/[...]"], cowboy_static, [{directory, {priv_dir, ?WEBAPP, [<<"plugins">>]}},
 		{mimetypes, {fun mimetypes:path_to_mimes/2, default}}]},
-	    {["/doc/[...]"], cowboy_static, [{directory, {priv_dir, ?APP, [<<"doc">>]}},
+	    {["/doc/[...]"], cowboy_static, [{directory, {priv_dir, ?WEBAPP, [<<"doc">>]}},
 		{mimetypes, {fun mimetypes:path_to_mimes/2, default}}]},
 	    {["/get_jqgrid_data/[...]"], get_jqgrid_data, []},
 	    %% {["get_jqgrid_data", '*'], get_jqgrid_data, []},

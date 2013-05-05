@@ -4,9 +4,7 @@
 -include_lib ("nitrogen_core/include/wf.hrl").
 -include_lib("nitrogen_elements/include/nitrogen_elements.hrl").
 -include_lib("ec_web/include/elements.hrl").
-
-%% -define(DATA, <<"digraph G {subgraph cluster_0 {style=filled;color=lightgrey; node [style=filled,color=white]; a0 -> a1 -> a2 -> a3;label = \"process #1\";} subgraph cluster_1 {node [style=filled]; b0 -> b1 -> b2 -> b3; label = \"process #2\";color=blue} start -> a0; start -> b0; a1 -> b3; b2 -> a3; a3 -> a0; a3 -> end; b3 -> end; start [shape=Mdiamond]; end [shape=Msquare];}">>).
-
+-include_lib("ec_web/include/ec_web.hrl").
 
 %% main() ->
 %%     case wf:role(admin) of
@@ -130,30 +128,27 @@ grid(Rundate) ->
 event(connect) ->
     Rundate = wf:q(rundates),
     %% need to be a valid address of the web host
-    Server = "ws://rs.home:8000/websocket/?date=" ++ Rundate,
-    %% ?PRINT({viz_server, Server}),
-    wf:wire(#ws_open{server = Server, func = "function(event){console.log('open')};"}),
-    wf:wire(#ws_message{func = wf:f("function(event){var g = jQuery(obj('~s'));
-                                               g.html(Viz(event.data, \"svg\"));
-	                                       g.find(\"svg\").width('100%');
-	                                       g.find(\"svg\").graphviz({status: true});};", [graph_viz])}),
-    wf:wire(#ws_error{func = "function(event){console.log('error')};"}),
-    wf:replace(conn, #button{id = conn, text = "Disconnect", actions = [#event{type = click, postback = disconnect}]});
+    case index_fns:get_websocket_name(Rundate) of
+	{error, _} -> io:format("can't find node for resource ~p~n", [ec_master]);
+	{ok, Server} ->
+	    io:format("connecting to websocket at address: ~p~n", [Server]),
+	    wf:wire(#ws_open{server = Server, func = "function(event){console.log('open')};"}),
+	    wf:wire(#ws_message{func = wf:f("function(event){var g = jQuery(obj('~s'));
+		g.html(Viz(event.data, \"svg\"));
+		g.find(\"svg\").width('100%');
+		g.find(\"svg\").graphviz({status: true});};", [graph_viz])}),
+	    wf:wire(#ws_error{func = "function(event){console.log('error')};"}),
+	    wf:replace(conn, #button{id = conn, text = "Disconnect", actions = [#event{type = click, postback = disconnect}]})
+    end;
 event(disconnect) ->
+    io:format("disconnecting from websocket ~n", []),
     wf:wire(#ws_close{}),
     wf:replace(conn, #button{id = conn, text = "Connect", actions = [#event{type = click, postback = connect}]});
-
-%% event({tabs,?EVENT_TABS_ACTIVATE}, TabIndex) ->
-%%     RunDate = wf:q(dropdown1)
-%%     wf:wire(wf:f("pushState(\"State~s\", \"?date=~s&tab=~s\", {date:~s, tabindex:~s});",
-%% 		 [TabIndex, RunDate, TabIndex, RunDate, TabIndex]));
-
 event({ID, ?EVENT_TABS_ACTIVATE}) ->
     RunDate = wf:q(rundates),
     ?PRINT({tabs_event, ?EVENT_TABS_ACTIVATE, RunDate}),
     wf:wire(wf:f("(function(){var index = jQuery(obj('~s')).tabs(\"option\", \"active\");
     	pushState(\"State\"+index, \"?state=~s&\"+index, {date:~s, tabindex:index});})();", [ID, RunDate, RunDate]));
-
 event(go) ->
     Rundate = wf:q(rundates),
     Url = list_to_binary("get_graph_nodes/?date=" ++ Rundate),
@@ -161,7 +156,6 @@ event(go) ->
     	undefined -> undefined;
     	Other -> ec_db:get_node(list_to_atom(Other))
     end,
-
     DotData = case G of
     	undefined -> <<>>;
     	G1 -> ec_digraphdot:generate_dot(G1)
