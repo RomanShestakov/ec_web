@@ -58,7 +58,7 @@ to_json(Req, State) ->
 make_link(N, Date) when is_binary(Date)-> make_link(N, binary_to_list(Date));
 make_link(N, Date) ->
     N1 = binary_to_list(N),
-    list_to_binary("<a href='/web_page3/" ++ Date ++ "/" ++ N1 ++ "'>" ++ N1 ++ "</a>").
+    list_to_binary("<a href='/web_page3/" ++ Date ++ "/" ++ N1 ++ "'" ++ "class=wfid_deps_link" ++ ">" ++ N1 ++ "</a>").
 
 get_parent_names(L, Date) when is_binary(Date)-> get_parent_names(L, binary_to_list(Date));
 get_parent_names(L, Date) ->

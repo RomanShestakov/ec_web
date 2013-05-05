@@ -25,8 +25,9 @@ layout() ->
     Rundate = wf:q(rundates),
 
 
-    %%     wf:wire(tabs, #tab_event_on{type = ?EVENT_TABS_ACTIVATE}),
-    %%     wf:wire(#api{name=history_back, tag=f1}),
+    %% wf:wire(tabs, #tab_event_on{type = ?EVENT_TABS_ACTIVATE}),
+    %% #tab_event_on{trigger = tabs, type = ?EVENT_TABS_ACTIVATE, postback = {tabs, ?EVENT_TABS_ACTIVATE}},
+    wf:wire(#api{name=history_back, tag=f1}),
 
 
     %% wf:wire(wf:f("$(objs('~s')).click(function(){alert('perform action here');})", [deps])),
@@ -40,7 +41,7 @@ layout() ->
 	% Main layout...
 	#layout {
 	    %% add menubar for navigation
-	    north=#panel{id = north, text = "North"},
+	    north=#panel{id = north, text = ""},
 	    north_options = [{size, 60}, {spacing_open, 0}, {spacing_closed, 0}],
 
 	    %% west=#panel{id = west, text = "West"},
@@ -56,7 +57,7 @@ layout() ->
 		#tabs{
 		    id=tabs,
 		    options=[{selected, 0}, {closable, true}],
-		    actions = [#tab_cache{target = tabs}],
+		    %% actions = [#tab_cache{target = tabs}],
 		    style="margin:0; padding: 0 0 0 0;",
 		    tabs=[
 			#tab{title="Jobs",
@@ -64,7 +65,12 @@ layout() ->
 			    closable=false,
 			    body=[grid(Rundate)]},
 			#tab{title="Graph", closable=false, body=[#panel{id=graph_viz}]}
-		]}
+		],
+		    actions = [
+			#tab_cache{target = tabs},
+			#tab_event_on{trigger = tabs, type = ?EVENT_TABS_ACTIVATE, postback = {tabs, ?EVENT_TABS_ACTIVATE}}
+		    ]
+		}
 	    ]},
 
 	    %% option to resize grid on layout size change
@@ -121,7 +127,6 @@ grid(Rundate) ->
 	    {groupingView, {{groupField, ['group']}, {groupColumnShow, [false]}, {groupText, [<<"<b>{0} - {1} Item(s)</b>">>]}}}
     ]}.
 
-
 event(connect) ->
     Rundate = wf:q(rundates),
     %% need to be a valid address of the web host
@@ -138,31 +143,16 @@ event(disconnect) ->
     wf:wire(#ws_close{}),
     wf:replace(conn, #button{id = conn, text = "Connect", actions = [#event{type = click, postback = connect}]});
 
-%% api_event(history_back, _B, [[_,{data, Data}]]) ->
-%%     ?PRINT({history_back_event, _B, Data}),
-%%     RunDate = proplists:get_value(date, Data),
-%%     Query = wf:q(txt_query),
-%%     ?PRINT({run_date, RunDate}),
-%%     TabIndex = proplists:get_value(tabindex, Data),
-%%     ProcessData = index_fns:select(RunDate, Query),
-%%     wf:wire(tabs, #tab_event_off{type = ?EVENT_TABS_ACTIVATE}),
-%%     wf:wire(tabs, #tab_select{tab = TabIndex}),
-%%     wf:replace(tbl_process, #process_table{id=tbl_process, data = ProcessData}),
-%%     wf:wire(tabs, #tab_event_on{type = ?EVENT_TABS_ACTIVATE});
-%% api_event(A, B, C) ->
-%%     ?PRINT(A), ?PRINT(B), ?PRINT(C).
-
-%% event(?EVENT_TABS_ACTIVATE, _Tabs_Id, TabIndex) ->
-%%     RunDate = wf:q(dropdown1),
+%% event({tabs,?EVENT_TABS_ACTIVATE}, TabIndex) ->
+%%     RunDate = wf:q(dropdown1)
 %%     wf:wire(wf:f("pushState(\"State~s\", \"?date=~s&tab=~s\", {date:~s, tabindex:~s});",
-%% 	[TabIndex, RunDate, TabIndex, RunDate, TabIndex])).
+%% 		 [TabIndex, RunDate, TabIndex, RunDate, TabIndex]));
 
-%% event(click) ->
-%%     RunDate = wf:q(dropdown1),
-%%     Data = index_fns:get_jobs(RunDate),
-%%     wf:replace(button, #panel{
-%%     		 body = wf:f("~p", [Data]),
-%%     		 actions=#effect { effect=highlight }});
+event({ID, ?EVENT_TABS_ACTIVATE}) ->
+    RunDate = wf:q(rundates),
+    ?PRINT({tabs_event, ?EVENT_TABS_ACTIVATE, RunDate}),
+    wf:wire(wf:f("(function(){var index = jQuery(obj('~s')).tabs(\"option\", \"active\");
+    	pushState(\"State\"+index, \"?state=~s&\"+index, {date:~s, tabindex:index});})();", [ID, RunDate, RunDate]));
 
 event(go) ->
     Rundate = wf:q(rundates),
@@ -181,20 +171,28 @@ event(go) ->
 event(Event) ->
     ?PRINT({Event}).
 
-%% jqgrid_event(Event) ->
-%%     wf:wire(wf:f("$(objs('~s')).click(function(event){event.preventDefault();
-%% 	var linkTo = $(this).attr(\"href\");
-%% 	$(\"<li><a href = \" + linkTo + \">\" + linkTo.split(\"/\").slice(-1)[0] + \"</a></li>\").appendTo($(obj(\"\#\#~s .ui-tabs-nav\")));
-%% 	$(obj('~s')).tabs(); //annoyingly need to re-init the tabs
-%% 	$(obj('~s')).tabs(\"refresh\");
-%%     })", [deps_link, tabs, tabs, tabs])).
-
+%% this overrides click event on the links
+%% so instead opening the link in the new page, we open a new tab
 jqgrid_event(Event) ->
     wf:wire(wf:f("$(objs('~s')).click(function(event){event.preventDefault();
 	var linkTo = $(this).attr(\"href\");
 	$(\"<li><a href = \" + linkTo + \">\" + linkTo.split(\"/\").slice(-1)[0] + \"</a></li>\").appendTo($(obj(\"\#\#~s .ui-tabs-nav\")));
 	$(obj('~s')).tabs(\"refresh\");
     })", [deps_link, tabs, tabs])).
+
+api_event(history_back, _B, [[_,{data, Data}]]) ->
+    ?PRINT({history_back_event, _B, Data}),
+    RunDate = proplists:get_value(date, Data),
+    %% Query = wf:q(txt_query),
+    %% ?PRINT({run_date, RunDate}),
+    TabIndex = proplists:get_value(tabindex, Data),
+    %% ProcessData = index_fns:select(RunDate, Query),
+    wf:wire(tabs, #tab_event_off{type = ?EVENT_TABS_ACTIVATE}),
+    wf:wire(tabs, #tab_select{tab = TabIndex}),
+    %% wf:replace(tbl_process, #process_table{id=tbl_process, data = ProcessData}),
+    wf:wire(tabs, #tab_event_on{trigger = tabs, type = ?EVENT_TABS_ACTIVATE, postback = {tabs, ?EVENT_TABS_ACTIVATE}});
+api_event(A, B, C) ->
+    ?PRINT(A), ?PRINT(B), ?PRINT(C).
 
 
 %% jqgrid_event(Event) ->
