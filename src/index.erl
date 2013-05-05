@@ -20,16 +20,12 @@ main() ->
 title() -> "Nitrogen Web Framework for Erlang".
 
 layout() ->
-    Rundate = wf:q(rundates),
+    Rundate = wf:q(date),
 
+    ?PRINT({rundate, Rundate}),
 
-    %% wf:wire(tabs, #tab_event_on{type = ?EVENT_TABS_ACTIVATE}),
-    %% #tab_event_on{trigger = tabs, type = ?EVENT_TABS_ACTIVATE, postback = {tabs, ?EVENT_TABS_ACTIVATE}},
+    %% create event for history API
     wf:wire(#api{name=history_back, tag=f1}),
-
-
-    %% wf:wire(wf:f("$(objs('~s')).click(function(){alert('perform action here');})", [deps])),
-
     %% action triggered on layout resize event to dynamically resize grid to fill parent container
     wf:wire(wf:f("function resizeGrid(pane, $pane, paneState){
                     var $contentDiv = $pane.find('.ui-widget-header');
@@ -44,7 +40,7 @@ layout() ->
 
 	    %% west=#panel{id = west, text = "West"},
 	    west=#panel{id = west, body = [
-		control_panel(),
+		control_panel(Rundate),
 		#p{},
 		#button{id = conn, text = "Connect", actions = [#event{type = click, postback = connect}]}
 	    ]},
@@ -84,10 +80,15 @@ layout() ->
 	}
     ].
 
-control_panel() ->
-    #panel{id=control_panel, body = [
-	#dropdown { id=rundates, options=index_fns:get_schedule_rundates()},
-	#button{id=run_btn, text="Run", actions=[#event{type=click, postback=go}]}
+control_panel([]) ->
+    #panel{id = control_panel, body = [
+	#dropdown{id = rundates, options = index_fns:get_schedule_rundates()},
+	#button{id = run_btn, text = "Run", actions = [#event{type = click, postback = go}]}
+    ]};
+control_panel(RunDate) ->
+    #panel{id = control_panel, body = [
+	#dropdown{id = rundates, value = RunDate, options = index_fns:get_schedule_rundates()},
+	#button{id = run_btn, text = "Run", actions = [#event{type = click, postback = go}]}
     ]}.
 
 grid(Rundate) when is_atom(Rundate) -> grid(atom_to_list(Rundate));
@@ -148,7 +149,7 @@ event({ID, ?EVENT_TABS_ACTIVATE}) ->
     RunDate = wf:q(rundates),
     ?PRINT({tabs_event, ?EVENT_TABS_ACTIVATE, RunDate}),
     wf:wire(wf:f("(function(){var index = jQuery(obj('~s')).tabs(\"option\", \"active\");
-    	pushState(\"State\"+index, \"?state=~s&\"+index, {date:~s, tabindex:index});})();", [ID, RunDate, RunDate]));
+    	pushState(\"Date=~s&\"+index, \"?date=~s&\"+index, {date:~s, tabindex:index});})();", [ID, RunDate, RunDate, RunDate]));
 event(go) ->
     Rundate = wf:q(rundates),
     Url = list_to_binary("get_graph_nodes/?date=" ++ Rundate),
@@ -178,7 +179,7 @@ jqgrid_event(Event) ->
 
 api_event(history_back, _B, [[_,{data, Data}]]) ->
     ?PRINT({history_back_event, _B, Data}),
-    RunDate = proplists:get_value(date, Data),
+    %% RunDate = proplists:get_value(date, Data),
     %% Query = wf:q(txt_query),
     %% ?PRINT({run_date, RunDate}),
     TabIndex = proplists:get_value(tabindex, Data),

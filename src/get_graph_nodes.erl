@@ -25,7 +25,7 @@ to_json(Req, State) ->
 	%% get all vertixes
 	Vs = mdigraph:vertices(G),
 	VertexInfo = lists:sort(fun({N1, _}, {N2, _}) -> N1 < N2 end, [mdigraph:vertex(G, V) || V <- Vs]),
-	P = ec_counter:start_counter(1),
+	P = ec_counter:start(1),
 	%% format rows
 	Rows = [{struct, [{<<"id">>, ec_counter:next(P)},
 	    {<<"cell">>, [make_link(N, Date),
@@ -37,12 +37,13 @@ to_json(Req, State) ->
 		get_parent_names(L, Date)
 	]}]}
     || {N, L} <- VertexInfo, L =/= [], L#fsm_state.type =/= timer],
+	%% stop counter
+	ec_counter:stop(P),
 	%% how many pages?
 	Total = case length(Rows) > 0 of
 	    true -> ec_util:ceiling(length(Rows) / RowsPerPage);
 	    false -> 0
 	end,
-
 	%% add row information
 	Data = {struct, [
 	    {<<"page">>, Page},

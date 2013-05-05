@@ -1,23 +1,24 @@
 -module(ec_counter).
--export([start_counter/1, next/1]).
+-export([start/1, stop/1, next/1]).
 
 %% start counter
-start_counter(StartValue) ->
+start(StartValue) ->
     spawn(fun() -> loop(StartValue) end).
 
+stop(CounterPid) -> CounterPid ! {stop, self()}.
+
 %% get next count
-next(Counter) ->
-    Counter ! {incr, self()},
+next(CounterPid) ->
+    CounterPid ! {incr, self()},
     receive
-	Count ->
-	    Count
+	Count -> Count
     end.
 
 %% couner loop
 loop(Count) ->
     receive
 	{incr, From} ->
-
 	    From ! Count,
-	    loop(Count + 1)
+	    loop(Count + 1);
+	stop -> void
     end.

@@ -8,8 +8,8 @@
 
 get_schedule_rundates() ->
     try
-	S = ec_db:get_names(), %ec_cli:get_schedulers(),
-	[#option { text = atom_to_list(Date), value = Date } || Date <- S]
+	S = lists:sort(ec_db:get_names()),
+	[#option{text = atom_to_list(Date), value = atom_to_list(Date)} || Date <- S]
     catch
 	throw:_Reason -> [#option { text = "", value = "" }]
     end.
@@ -24,13 +24,15 @@ select(RunDate, RegExpr) ->
     %% get all vertixes
     Vs = mdigraph:vertices(G),
     VertexInfo = [mdigraph:vertex(G, V) || V <- Vs],
-    P = ec_counter:start_counter(1),
-    [[{data, ec_counter:next(P)}, binary_to_list(N), "/web_page3/" ++ RunDate ++ "/" ++ binary_to_list(N),
-      RunDate, atom_to_list(L#fsm_state.state),
-      format_time(L#fsm_state.start_time, L#fsm_state.date_offset),
-      format_time(L#fsm_state.end_time, L#fsm_state.date_offset),
-      get_parent_names(L, RunDate)
-    ] || {N, L} <- VertexInfo, L =/= [], L#fsm_state.type =/= timer].
+    P = ec_counter:start(1),
+    Data = [[{data, ec_counter:next(P)}, binary_to_list(N), "/web_page3/" ++ RunDate ++ "/" ++ binary_to_list(N),
+	     RunDate, atom_to_list(L#fsm_state.state),
+	     format_time(L#fsm_state.start_time, L#fsm_state.date_offset),
+	     format_time(L#fsm_state.end_time, L#fsm_state.date_offset),
+	     get_parent_names(L, RunDate)
+	    ] || {N, L} <- VertexInfo, L =/= [], L#fsm_state.type =/= timer],
+    ec_counter:stop(P),
+    Data.
 
 
 format_time(Time, Offset) ->
