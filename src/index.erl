@@ -97,7 +97,7 @@ grid(Rundate) ->
     Url = list_to_binary("get_graph_nodes/?date=" ++ Rundate),
     #jqgrid{
 	id=jqgrid,
-	actions = [#jqgrid_event{trigger = jqgrid, target = jqgrid, type = ?ONLOADCOMPLETE, postback = on_load_complete}],
+	actions = [#jqgrid_event{trigger = jqgrid, target = jqgrid, type = ?ONLOADCOMPLETE, postback = ?ONLOADCOMPLETE}],
 	options=[
 	    {url, Url},
 	    {datatype, <<"json">>},
@@ -173,12 +173,14 @@ event(Event) ->
 
 %% this overrides click event on the links
 %% so instead opening the link in the new page, we open a new tab
-jqgrid_event(Event) ->
+jqgrid_event({?ONLOADCOMPLETE, _}) ->
     wf:wire(wf:f("$(objs('~s')).click(function(event){event.preventDefault();
 	var linkTo = $(this).attr(\"href\");
 	$(\"<li><a href = \" + linkTo + \">\" + linkTo.split(\"/\").slice(-1)[0] + \"</a></li>\").appendTo($(obj(\"\#\#~s .ui-tabs-nav\")));
 	$(obj('~s')).tabs(\"refresh\");
-    })", [deps_link, tabs, tabs])).
+    })", [deps_link, tabs, tabs]));
+jqgrid_event(Event) ->
+    ?PRINT({jqgrid_event, Event}).
 
 api_event(history_back, _B, [[_,{data, Data}]]) ->
     ?PRINT({history_back_event, _B, Data}),
