@@ -161,6 +161,8 @@ event(go) ->
     	undefined -> <<>>;
     	G1 -> ec_digraphdot:generate_dot(G1)
     end,
+    wf:wire(wf:f("(function(){var index = jQuery(obj('~s')).tabs(\"option\", \"active\");
+    	pushState(\"Date=~s&\"+index, \"?date=~s&\"+index, {date:~s, tabindex:index});})();", [tabs, Rundate, Rundate, Rundate])),
     wf:wire(wf:f("$(obj('~s')).jqGrid('setGridParam', {url: '~s'}).trigger(\"reloadGrid\");", [jqgrid, Url])),
     wf:replace(graph_viz, #viz{id = graph_viz, data = DotData});
 event(Event) ->
