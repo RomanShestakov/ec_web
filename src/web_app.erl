@@ -9,7 +9,7 @@
 -include_lib("ec_web/include/ec_web.hrl").
 
 %% required apps for ec_master
--define(APPS, [nprocreg, sync, crypto, ranch, cowboy, resource_discovery, ?WEBAPP]).
+-define(APPS, [lager, nprocreg, sync, crypto, ranch, cowboy, resource_discovery, ?WEBAPP]).
 
 %% ===================================================================
 %% Application callbacks

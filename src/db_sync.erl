@@ -75,7 +75,7 @@ init([]) ->
 find_resource(?EVENT_TIME_IS_UP, State) ->
     %% check if we have a resource of the given type somewhere in the claster
     MasterNode = resource_discovery:get_resources(?MASTER),
-    log4erl:info("db_sync checking resource: ~p, found: ~p", [?MASTER, MasterNode]),
+    %% lager:info("db_sync checking resource: ~p, found: ~p", [?MASTER, MasterNode]),
     case MasterNode of
 	[] ->
 	    %% no resources found, so go back to waiting
@@ -87,7 +87,7 @@ find_resource(?EVENT_TIME_IS_UP, State) ->
     end.
 
 sync_resource({sync, Node}, State) ->
-    log4erl:info("db_sync: replicating mnesia from node: ~p", [Node]),
+    %% lager:info("db_sync: replicating mnesia from node: ~p", [Node]),
     %% init db replication
     case add_node(Node) of
     	ok ->
@@ -101,7 +101,7 @@ sync_resource({sync, Node}, State) ->
     end.
 
 keepalive_resource(?EVENT_TIME_IS_UP, State) ->
-    log4erl:info("db_sync keepalive"),
+    lager:info("db_sync keepalive"),
     NofResource = resource_discovery:get_num_resource(?MASTER),
     case NofResource of
     	0 ->
