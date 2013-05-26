@@ -63,7 +63,7 @@ start_link() ->
 %%--------------------------------------------------------------------
 init([]) ->
     process_flag(trap_exit, true),
-    io:format("Starting db_sync to replicate resource ~p ~n", [?MASTER]),
+    lager:info("Starting db_sync to replicate resource ~p ~n", [?MASTER]),
     %% start fresh mnesia
     init_db(),
     %% announce that we want to know about ec_master resource
@@ -87,15 +87,15 @@ find_resource(?EVENT_TIME_IS_UP, State) ->
     end.
 
 sync_resource({sync, Node}, State) ->
-    %% lager:info("db_sync: replicating mnesia from node: ~p", [Node]),
+    lager:info("db_sync: replicating mnesia from node: ~p", [Node]),
     %% init db replication
     case add_node(Node) of
     	ok ->
-    	    io:format("succesfully replicated mnesia node ~p ~n", [Node]),
+    	    lager:info("succesfully replicated mnesia node ~p ~n", [Node]),
 	    gen_fsm:send_event_after(30 * 1000, ?EVENT_TIME_IS_UP),
 	    {next_state, keepalive_resource, State};
     	{error, Reason} ->
-    	    io:format("failed for to replicate mnesia node: ~p ~n", [Node]),
+    	    lager:error("failed for to replicate mnesia node: ~p ~n", [Node]),
 	    gen_fsm:send_event_after(10 * 1000, ?EVENT_TIME_IS_UP),
 	    {next_state, find_resource, State}
     end.
@@ -105,12 +105,12 @@ keepalive_resource(?EVENT_TIME_IS_UP, State) ->
     NofResource = resource_discovery:get_num_resource(?MASTER),
     case NofResource of
     	0 ->
-    	    io:format("db_sync: master node is lost, cleaning schema ~n"),
+    	    lager:error("db_sync: master node is lost, cleaning schema ~n"),
 	    init_db(),
 	    gen_fsm:send_event_after(10 * 1000, ?EVENT_TIME_IS_UP),
 	    {next_state, find_resource, State};
 	Other ->
-	    io:format("db_sync: master is alive ~n"),
+	    lager:info("db_sync: master is alive ~n"),
 	    gen_fsm:send_event_after(30 * 1000, ?EVENT_TIME_IS_UP),
 	    {next_state, keepalive_resource, State}
     end.
@@ -244,7 +244,7 @@ init_db() ->
     mnesia:start().
 
 add_node(Node) ->
-    io:format("Replicating mnesia node from(~s) ~n", [Node]),
+    lager:info("Replicating mnesia node from(~s) ~n", [Node]),
     case mnesia:change_config(extra_db_nodes, [Node] ) of
 	{ok, [_Node]} ->
 	    mnesia:add_table_copy(schema, node(), ram_copies),
@@ -255,7 +255,3 @@ add_node(Node) ->
 	 Reason ->
 	    {err, Reason}
     end.
-
-
-
-
