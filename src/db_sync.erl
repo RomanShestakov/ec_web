@@ -63,7 +63,7 @@ start_link() ->
 %%--------------------------------------------------------------------
 init([]) ->
     process_flag(trap_exit, true),
-    lager:info("Starting db_sync to replicate resource ~p ~n", [?MASTER]),
+    lager:info("Starting db_sync to replicate resource ~p", [?MASTER]),
     %% start fresh mnesia
     init_db(),
     %% announce that we want to know about ec_master resource
@@ -91,11 +91,11 @@ sync_resource({sync, Node}, State) ->
     %% init db replication
     case add_node(Node) of
     	ok ->
-    	    lager:info("succesfully replicated mnesia node ~p ~n", [Node]),
+    	    lager:info("succesfully replicated mnesia node ~p", [Node]),
 	    gen_fsm:send_event_after(30 * 1000, ?EVENT_TIME_IS_UP),
 	    {next_state, keepalive_resource, State};
     	{error, Reason} ->
-    	    lager:error("failed for to replicate mnesia node: ~p ~n", [Node]),
+    	    lager:error("failed for to replicate mnesia node: ~p", [Node]),
 	    gen_fsm:send_event_after(10 * 1000, ?EVENT_TIME_IS_UP),
 	    {next_state, find_resource, State}
     end.
@@ -105,12 +105,12 @@ keepalive_resource(?EVENT_TIME_IS_UP, State) ->
     NofResource = resource_discovery:get_num_resource(?MASTER),
     case NofResource of
     	0 ->
-    	    lager:error("db_sync: master node is lost, cleaning schema ~n"),
+    	    lager:error("db_sync: master node is lost, cleaning schema"),
 	    init_db(),
 	    gen_fsm:send_event_after(10 * 1000, ?EVENT_TIME_IS_UP),
 	    {next_state, find_resource, State};
 	Other ->
-	    lager:info("db_sync: master is alive ~n"),
+	    lager:info("db_sync: master is alive"),
 	    gen_fsm:send_event_after(30 * 1000, ?EVENT_TIME_IS_UP),
 	    {next_state, keepalive_resource, State}
     end.
@@ -244,7 +244,7 @@ init_db() ->
     mnesia:start().
 
 add_node(Node) ->
-    lager:info("Replicating mnesia node from(~s) ~n", [Node]),
+    lager:info("Replicating mnesia node from(~s)", [Node]),
     case mnesia:change_config(extra_db_nodes, [Node] ) of
 	{ok, [_Node]} ->
 	    mnesia:add_table_copy(schema, node(), ram_copies),
