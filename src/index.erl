@@ -181,7 +181,7 @@ jqgrid_event(Event) ->
 
 api_event(history_back, _B, [[_,{data, Data}]]) ->
     ?PRINT({history_back_event, _B, Data}),
-    %% RunDate = proplists:get_value(date, Data),
+    RunDate = proplists:get_value(date, Data),
     %% Query = wf:q(txt_query),
     %% ?PRINT({run_date, RunDate}),
     TabIndex = proplists:get_value(tabindex, Data),

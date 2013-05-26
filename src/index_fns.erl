@@ -50,9 +50,9 @@ select_node({Name, RunDate}) ->
     G = ec_db:get_node(list_to_atom(RunDate)),
     mdigraph:vertex(G, list_to_binary(Name)).
 
-clean(RunDate, Name) ->
-    io:format("Run Clean ~p ~p~n", [RunDate, Name]),
-    ec_cli:clean_process(list_to_atom(RunDate), Name).
+%% clean(RunDate, Name) ->
+%%     io:format("Run Clean ~p ~p~n", [RunDate, Name]),
+%%     ec_cli:clean_process(list_to_atom(RunDate), Name).
 
 get_svg(RunDate) ->
     G = ec_db:get_node(list_to_atom(RunDate)),
